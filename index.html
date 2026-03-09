@@ -577,7 +577,7 @@
             
             // Query Supabase for phone
             const { data, error } = await db
-                .from('profiles')
+                .from('UCHALY_profiles')
                 .select('*')
                 .eq('phone', currentPhone)
                 .single();
@@ -608,7 +608,7 @@
             btn.classList.add('loading');
 
             const { data, error } = await db
-                .from('profiles')
+                .from('UCHALY_profiles')
                 .insert([
                     { phone: currentPhone, name: name, role: 'passenger' }
                 ]);
