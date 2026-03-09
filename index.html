@@ -78,16 +78,46 @@
 
         /* Tabs: Login / Register */
         .tab-container { position: relative; display: flex; padding: 3px; background-color: var(--bg-primary); border-radius: 14px; border: 1px solid var(--border-color); }
-        .tab-container .indicator { width: 50%; height: 40px; background: var(--bg-elevated); position: absolute; top: 3px; left: 3px; z-index: 9; border-radius: 11px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* FIX: Indicator width adjusted to respect right margin */
+        .tab-container .indicator { width: calc(50% - 3px); height: 40px; background: var(--bg-elevated); position: absolute; top: 3px; left: 3px; z-index: 9; border-radius: 11px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .tab-container .tab { width: 50%; height: 40px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
         .tab-container .tab_label { width: 50%; height: 40px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
         .tab-container .tab:checked + .tab_label { color: var(--text-primary); }
-        .tab-container .tab--register:checked ~ .indicator { left: 50%; }
+        .tab-container .tab--register:checked ~ .indicator { left: 50%; } /* No need for calc here if width is adjusted, but let's keep it simple. Actually, since width is smaller, left 50% aligns start of indicator to middle. */
+        
+        /* Adjusting Register Indicator Position: 
+           Left is 3px. Width is calc(50% - 3px).
+           When checked, it should move to start at 50% + small offset? No, we want it to align right.
+           Let's stick to width: 50% but use a container padding fix or just standard right alignment.
+           Simplest fix: width calc(50% - 3px); left: 50% means it goes from 50% to 100%-3px. 
+           Wait, Left 50% + Width 50% = 100%. 
+           If width is calc(50% - 3px), then Right edge is 50% + 50% - 3px = 100% - 3px. 
+           This matches the 3px padding on the right. Perfect.
+        */
 
         /* Sub-Tabs: Passenger / Driver */
-        .sub-tab-container { position: absolute; top: calc(100% + 12px); right: 20px; width: 200px; display: flex; padding: 2px; background-color: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color); z-index: 10; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* FIX: Width adjusted to match active tab, alignment fixed */
+        .sub-tab-container { 
+            position: absolute; 
+            top: calc(100% + 12px); 
+            right: 23px; /* 20px card padding + 3px tab container padding */
+            width: calc(50% - 3px); /* Matches the active tab width */
+            display: flex; 
+            padding: 2px; 
+            background-color: var(--bg-primary); 
+            border-radius: 10px; 
+            border: 1px solid var(--border-color); 
+            z-index: 10; 
+            opacity: 0; 
+            transform: translateY(-10px); 
+            pointer-events: none; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
         .auth-card.is-register .sub-tab-container { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .sub-tab-container .indicator-sub { width: 50%; height: 28px; background: var(--bg-elevated); position: absolute; top: 2px; left: 2px; z-index: 9; border-radius: 8px; transition: all 0.3s ease; }
+        
+        /* FIX: Sub-indicator width */
+        .sub-tab-container .indicator-sub { width: calc(50% - 2px); height: 28px; background: var(--bg-elevated); position: absolute; top: 2px; left: 2px; z-index: 9; border-radius: 8px; transition: all 0.3s ease; }
         .sub-tab-container .sub-tab { width: 50%; height: 28px; position: absolute; z-index: 99; opacity: 0; cursor: pointer; }
         .sub-tab-container .sub-tab_label { width: 50%; height: 28px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
         .sub-tab-container .sub-tab:checked + .sub-tab_label { color: var(--accent); }
@@ -95,13 +125,16 @@
 
         .auth-card-body { padding: 20px; padding-top: 24px; min-height: 180px; position: relative; }
         
+        /* FIX: Padding increase when sub-menu appears */
+        .auth-card.is-register .auth-card-body { padding-top: 66px; } 
+
         /* Forms Wrapper Logic */
         .forms-wrapper { position: relative; width: 100%; overflow: hidden; }
         
         .auth-form { display: flex; flex-direction: column; gap: 14px; width: 100%; transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease; }
 
         .login-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; }
-        .register-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(30px); z-index: 1; pointer-events: none; max-height: 400px; } /* Limit height for scroll */
+        .register-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(30px); z-index: 1; pointer-events: none; max-height: 400px; }
 
         .auth-card.is-register .login-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(-30px); z-index: 1; pointer-events: none; }
         .auth-card.is-register .register-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; pointer-events: auto; }
@@ -110,7 +143,7 @@
         .form-scroll-area {
             max-height: 300px;
             overflow-y: auto;
-            padding-right: 4px; /* Scrollbar space */
+            padding-right: 4px; 
         }
         /* Webkit Scrollbar */
         .form-scroll-area::-webkit-scrollbar { width: 4px; }
@@ -140,6 +173,11 @@
         .file-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
         .file-upload-text { font-size: 13px; color: var(--text-secondary); }
         .file-upload-icon { font-size: 18px; margin-bottom: 4px; display: block; }
+        
+        /* Upload Status Indicator */
+        .upload-status { font-size: 11px; color: var(--accent); margin-top: 4px; display: none; }
+        .file-upload-area.uploaded { border-style: solid; border-color: var(--accent); }
+        .file-upload-area.uploaded .upload-status { display: block; }
 
         .submit-btn { width: 100%; padding: 16px 24px; background: var(--accent); color: #000; border: none; border-radius: var(--radius-base); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; margin-top: 8px; }
         .submit-btn:hover { background: var(--accent-hover); }
@@ -301,20 +339,23 @@
                                         
                                         <div style="font-size:12px; color:var(--text-muted); margin:10px 0;">Загрузка документов</div>
                                         
-                                        <div class="file-upload-area">
+                                        <div class="file-upload-area" id="uploadLicense">
                                             <input type="file" id="regFileLicense" accept="image/*">
                                             <span class="file-upload-icon">📷</span>
                                             <span class="file-upload-text">Фото водительского удостоверения</span>
+                                            <span class="upload-status">Загружено ✓</span>
                                         </div>
-                                        <div class="file-upload-area">
+                                        <div class="file-upload-area" id="uploadReg">
                                             <input type="file" id="regFileReg" accept="image/*">
                                             <span class="file-upload-icon">📄</span>
                                             <span class="file-upload-text">Фото свид. о регистрации (СТС)</span>
+                                            <span class="upload-status">Загружено ✓</span>
                                         </div>
-                                        <div class="file-upload-area">
+                                        <div class="file-upload-area" id="uploadCar">
                                             <input type="file" id="regFileCar" accept="image/*">
                                             <span class="file-upload-icon">🚗</span>
                                             <span class="file-upload-text">Фото авто спереди с госномером</span>
+                                            <span class="upload-status">Загружено ✓</span>
                                         </div>
                                     </div>
                                 </div>
@@ -445,6 +486,34 @@
         setupPhoneInput('regPhone');
 
         // ==========================================
+        // FILE UPLOAD HELPER
+        // ==========================================
+        async function uploadFile(fileInputId, bucketName, folderPath) {
+            const fileInput = document.getElementById(fileInputId);
+            const file = fileInput.files[0];
+            if (!file) return null;
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${folderPath}/${Date.now()}.${fileExt}`;
+
+            const { data, error } = await db.storage
+                .from(bucketName)
+                .upload(fileName, file);
+
+            if (error) {
+                console.error('Upload error:', error);
+                return null;
+            }
+
+            // Get Public URL
+            const { data: publicUrl } = db.storage
+                .from(bucketName)
+                .getPublicUrl(fileName);
+
+            return publicUrl.publicUrl;
+        }
+
+        // ==========================================
         // LOGIN LOGIC
         // ==========================================
         const pinInput = document.getElementById('pinInput');
@@ -452,7 +521,6 @@
         const loginStep1 = document.getElementById('loginStep1');
         const loginStep2 = document.getElementById('loginStep2');
         
-        // Click on PIN area focuses hidden input
         document.querySelector('.pin-dots-container').addEventListener('click', () => pinInput.focus());
 
         document.getElementById('getCodeBtn').addEventListener('click', () => {
@@ -470,7 +538,6 @@
             let val = e.target.value.replace(/\D/g, '');
             e.target.value = val;
             
-            // Update dots UI
             pinDots.forEach((dot, i) => {
                 if (i < val.length) dot.classList.add('filled');
                 else dot.classList.remove('filled');
@@ -496,7 +563,6 @@
                 showApp();
             } else if (error && error.code === 'PGRST116') {
                 alert("Пользователь не найден. Пожалуйста, зарегистрируйтесь.");
-                // Switch to Reg
                 tabRegister.checked = true;
                 authCard.classList.add('is-register');
                 document.getElementById('regPhone').value = phone;
@@ -512,7 +578,6 @@
             e.preventDefault();
             const btn = document.getElementById('regSubmitBtn');
             
-            // Gather Data
             const isDriver = roleDriver.checked;
             const phone = document.getElementById('regPhone').value;
             const lastName = document.getElementById('regLastName').value;
@@ -528,7 +593,6 @@
 
             btn.classList.add('loading');
 
-            // Prepare object
             let insertData = {
                 phone: phone,
                 last_name: lastName,
@@ -537,13 +601,23 @@
                 role: isDriver ? 'driver' : 'passenger'
             };
 
-            // If Driver, add extra fields
+            // If Driver, handle files and extra fields
             if (isDriver) {
                 insertData.car_model = document.getElementById('regCarModel').value;
                 insertData.car_color = document.getElementById('regCarColor').value;
                 insertData.car_plate = document.getElementById('regCarPlate').value;
-                // Note: File uploads need separate handling in Supabase Storage
-                // For now, we just register the user. 
+
+                // Upload Files
+                const folder = phone.replace(/\D/g, ''); // Folder name by phone number
+                
+                const licenseUrl = await uploadFile('regFileLicense', 'uchaly_docs', folder);
+                if(licenseUrl) insertData.driver_license_url = licenseUrl;
+
+                const regUrl = await uploadFile('regFileReg', 'uchaly_docs', folder);
+                if(regUrl) insertData.car_reg_url = regUrl;
+
+                const carUrl = await uploadFile('regFileCar', 'uchaly_docs', folder);
+                if(carUrl) insertData.car_photo_url = carUrl;
             }
 
             const { data, error } = await db.from('uchaly_users').insert([insertData]).select().single();
@@ -558,6 +632,15 @@
                 alert("Регистрация успешна!");
                 showApp();
             }
+        });
+
+        // Visual feedback for file inputs
+        document.querySelectorAll('.file-upload-area input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                if(this.files.length > 0) {
+                    this.parentElement.classList.add('uploaded');
+                }
+            });
         });
 
         function showError(msg) {
@@ -583,16 +666,17 @@
                 authOverlay.classList.add('visible');
                 loginForm.reset();
                 registerForm.reset();
-                // Reset steps
                 loginStep1.style.display = 'block';
                 loginStep2.style.display = 'none';
                 pinInput.value = '';
                 pinDots.forEach(d => d.classList.remove('filled'));
-                // Reset Tabs
                 tabLogin.checked = true;
                 authCard.classList.remove('is-register');
                 rolePassenger.checked = true;
                 driverFields.classList.remove('active');
+                
+                // Reset file upload visuals
+                document.querySelectorAll('.file-upload-area').forEach(el => el.classList.remove('uploaded'));
             }, 400);
         }
 
