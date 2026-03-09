@@ -6,54 +6,55 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" default>
-    <meta name="theme-color" content="#FFFFFF">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#F5F5F7">
     
     <title>Едем Учалы</title>
+    
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         :root {
-            /* Premium B&W Palette */
-            --bg-body: #F5F5F7; /* Apple-like light gray background */
-            --bg-primary: #FFFFFF;
-            --bg-glass: rgba(255, 255, 255, 0.72);
+            /* Palette based on Brief */
+            --bg-app: #F5F5F7;
+            --bg-card: #FFFFFF;
             
-            --text-primary: #1D1D1F;
-            --text-secondary: #86868b;
-            --text-muted: #AEAEB2;
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+            --text-muted: #1C1C1E;
             
-            --accent: #000000; /* Pure Black */
-            --accent-hover: #333333;
-            --accent-text: #FFFFFF;
+            --accent: #149A46;
+            --accent-dim: rgba(20, 154, 70, 0.1);
             
-            --danger: #FF3B30;
+            --border-color: #E5E5EA;
+            --divider: #F2F2F7;
             
-            --border-color: rgba(0, 0, 0, 0.08);
-            --border-light: rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.12);
             
-            --radius-base: 18px;
-            --radius-lg: 28px;
-            --radius-full: 100px;
-            
-            /* Shadows */
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
-            
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-card: 24px;
+            --radius-btn: 12px;
+            --radius-input: 14px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background-color: var(--bg-body);
+            font-family: 'SN Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-app);
             color: var(--text-primary);
             height: 100vh;
             height: 100dvh;
             overflow: hidden;
             display: flex;
             justify-content: center;
+            font-weight: 400;
         }
 
         #app {
@@ -64,61 +65,73 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            background-color: var(--bg-body);
         }
 
         /* ================= AUTH SECTION ================= */
         .auth-overlay {
             position: fixed; inset: 0; z-index: 100;
             display: flex; align-items: center; justify-content: center; padding: 20px;
-            background: var(--bg-body);
+            background: var(--bg-app);
             opacity: 0; visibility: hidden; pointer-events: none;
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.6s;
+            transition: opacity 0.5s ease, visibility 0s linear 0.5s;
         }
-        .auth-overlay.visible { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0s; }
+        .auth-overlay.visible { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.5s ease, visibility 0s linear 0s; }
 
-        .auth-container { width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; }
+        .auth-container { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; position: relative; }
 
         .auth-brand { margin-bottom: 48px; text-align: center; }
-        .brand-icon { width: 64px; height: 64px; background: var(--accent); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: var(--shadow-md); }
+        .brand-icon { 
+            width: 64px; height: 64px; 
+            background: var(--text-primary); border-radius: 20px; 
+            display: flex; align-items: center; justify-content: center; 
+            margin: 0 auto 20px; 
+            box-shadow: var(--shadow-md);
+        }
         .brand-icon svg { width: 32px; height: 32px; fill: white; }
         .brand-title { font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.5px; }
-        .brand-subtitle { font-size: 15px; color: var(--text-secondary); font-weight: 400; }
+        .brand-subtitle { font-size: 15px; color: var(--text-secondary); font-weight: 500; }
 
         .auth-card { 
-            width: 100%; background: var(--bg-glass); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.5);
-            border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); 
-            overflow: hidden; 
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            width: 100%; background: var(--bg-card); 
+            border-radius: var(--radius-card); 
+            box-shadow: var(--shadow-lg); overflow: hidden; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
             transform: scale(0.95) translateY(20px); 
         }
         .auth-overlay.visible .auth-card { transform: scale(1) translateY(0); }
         
         .auth-card-header { padding: 24px 24px 0; position: relative; }
 
-        .tab-container { position: relative; display: flex; padding: 4px; background-color: rgba(0,0,0,0.05); border-radius: 12px; border: none; }
-        .tab-container .indicator { width: calc(50% - 4px); height: 100%; background: var(--bg-primary); position: absolute; top: 4px; left: 4px; z-index: 9; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-sm); }
+        /* Tabs */
+        .tab-container { position: relative; display: flex; padding: 4px; background-color: var(--bg-app); border-radius: 14px; border: none; }
+        .tab-container .indicator { width: calc(50% - 4px); height: 100%; background: var(--bg-card); position: absolute; top: 4px; left: 4px; z-index: 9; border-radius: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-sm); }
         .tab-container .tab { width: 50%; height: 40px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
-        .tab-container .tab_label { width: 50%; height: 40px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: color 0.3s ease; }
+        .tab-container .tab_label { width: 50%; height: 40px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: color 0.3s ease; }
         .tab-container .tab:checked + .tab_label { color: var(--text-primary); }
         .tab-container .tab--register:checked ~ .indicator { left: 50%; }
         
-        .sub-tab-container { position: absolute; top: calc(100% + 12px); right: 23px; width: calc(50% - 3px); display: flex; padding: 2px; background-color: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color); z-index: 10; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-md); }
+        .sub-tab-container { 
+            position: absolute; top: calc(100% + 12px); right: 24px; 
+            width: calc(50% - 4px); display: flex; padding: 2px; 
+            background-color: var(--bg-card); border-radius: 10px; 
+            border: 1px solid var(--border-color); 
+            z-index: 10; opacity: 0; transform: translateY(-10px); 
+            pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: var(--shadow-md); 
+        }
         .auth-card.is-register .sub-tab-container { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .sub-tab-container .indicator-sub { width: calc(50% - 2px); height: 28px; background: var(--accent); position: absolute; top: 2px; left: 2px; z-index: 9; border-radius: 8px; transition: all 0.3s ease; }
         .sub-tab-container .sub-tab { width: 50%; height: 28px; position: absolute; z-index: 99; opacity: 0; cursor: pointer; }
-        .sub-tab-container .sub-tab_label { width: 50%; height: 28px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
+        .sub-tab-container .sub-tab_label { width: 50%; height: 28px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
         .sub-tab-container .sub-tab:checked + .sub-tab_label { color: white; }
         .sub-tab-container .sub-tab--driver:checked ~ .indicator-sub { left: 50%; }
 
         .auth-card-body { padding: 24px; min-height: 180px; position: relative; }
-        .auth-card.is-register .auth-card-body { padding-top: 66px; } 
+        .auth-card.is-register .auth-card-body { padding-top: 70px; } 
 
         .forms-wrapper { position: relative; width: 100%; overflow: hidden; }
         
-        .auth-form { display: flex; flex-direction: column; gap: 14px; width: 100%; transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease; }
+        .auth-form { display: flex; flex-direction: column; gap: 16px; width: 100%; transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease; }
 
         .login-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; }
         .register-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(30px); z-index: 1; pointer-events: none; max-height: 400px; }
@@ -127,36 +140,51 @@
         .auth-card.is-register .register-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; pointer-events: auto; }
 
         .form-scroll-area { max-height: 300px; overflow-y: auto; padding-right: 4px; }
-        .form-scroll-area::-webkit-scrollbar { width: 0px; }
+        .form-scroll-area::-webkit-scrollbar { width: 4px; }
+        .form-scroll-area::-webkit-scrollbar-track { background: transparent; }
+        .form-scroll-area::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
 
-        .input-container { position: relative; width: 100%; margin-bottom: 14px; }
-        .styled_input_bar { width: 100%; padding: 16px 16px; font-size: 15px; font-family: inherit; border: 1px solid var(--border-color); border-radius: 12px; background-color: rgba(255,255,255,0.6); color: var(--text-primary); outline: none; transition: all 0.3s ease; }
+        .input-container { position: relative; width: 100%; margin-bottom: 16px; }
+        .styled_input_bar { 
+            width: 100%; padding: 18px 16px; font-size: 15px; font-family: inherit; 
+            border: 1px solid var(--border-color); border-radius: var(--radius-input); 
+            background-color: var(--bg-app); color: var(--text-primary); outline: none; 
+            transition: all 0.3s ease; 
+        }
         .styled_input_bar::placeholder { color: transparent; }
-        .styled_input_bar:focus { border-color: var(--accent); background-color: white; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
-        .input-label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; font-family: inherit; color: var(--text-muted); pointer-events: none; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); background: transparent; padding: 0 6px; }
-        .styled_input_bar:focus + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: 0; left: 12px; font-size: 11px; font-weight: 600; background-color: white; color: var(--accent); padding: 0 4px; }
+        .styled_input_bar:focus { border-color: var(--text-primary); background-color: var(--bg-card); box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
+        .input-label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; font-family: inherit; color: var(--text-secondary); pointer-events: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: transparent; padding: 0 6px; }
+        .styled_input_bar:focus + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: 0; left: 12px; font-size: 11px; font-weight: 600; background-color: var(--bg-card); color: var(--text-primary); padding: 0 4px; }
 
-        .file-upload-area { border: 1px dashed var(--border-color); border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 14px; position: relative; overflow: hidden; background: rgba(255,255,255,0.4); }
-        .file-upload-area:hover { border-color: var(--accent); background: rgba(0,0,0,0.02); }
+        .file-upload-area { border: 1px dashed var(--border-color); border-radius: var(--radius-input); padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; position: relative; overflow: hidden; background: var(--bg-app); }
+        .file-upload-area:hover { border-color: var(--text-primary); background: white; }
         .file-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
         .file-upload-text { font-size: 13px; color: var(--text-secondary); }
-        .file-upload-icon { font-size: 18px; margin-bottom: 4px; display: block; }
-        .upload-status { font-size: 11px; color: var(--accent); margin-top: 4px; display: none; font-weight: 600; }
-        .file-upload-area.uploaded { border-style: solid; border-color: var(--accent); background: rgba(0,0,0,0.03); }
+        .file-upload-icon { font-size: 20px; margin-bottom: 4px; display: block; }
+        .upload-status { font-size: 11px; color: var(--accent); margin-top: 4px; display: none; font-weight: 700; }
+        .file-upload-area.uploaded { border-style: solid; border-color: var(--accent); background: var(--accent-dim); }
         .file-upload-area.uploaded .upload-status { display: block; }
 
-        .submit-btn { width: 100%; padding: 16px 24px; background: var(--accent); color: var(--accent-text); border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; margin-top: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .submit-btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
-        .submit-btn:disabled { background: #D1D1D6; color: white; cursor: not-allowed; box-shadow: none; transform: none; }
+        /* Buttons */
+        .submit-btn { 
+            width: 100%; padding: 18px 24px; 
+            background: var(--text-primary); color: white; 
+            border: none; border-radius: var(--radius-btn); 
+            font-size: 15px; font-weight: 600; cursor: pointer; 
+            transition: all 0.2s ease; position: relative; overflow: hidden; 
+            margin-top: 8px; 
+        }
+        .submit-btn:active { background: var(--accent); transform: scale(0.98); }
+        .submit-btn:disabled { background: var(--border-color); color: var(--text-secondary); cursor: not-allowed; }
         .submit-btn .loader { display: none; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         .submit-btn.loading .btn-text { visibility: hidden; }
         .submit-btn.loading .loader { display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
         @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
         /* PIN Dots */
-        .pin-dots-container { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-        .pin-dot { flex: 1; height: 50px; background: rgba(0,0,0,0.04); border: 2px solid transparent; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+        .pin-dots-container { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+        .pin-dot { flex: 1; height: 56px; background: var(--bg-app); border: 2px solid var(--border-color); border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .pin-dot.filled { background: var(--text-primary); border-color: var(--text-primary); }
         .pin-dot.filled::after { content: ''; width: 12px; height: 12px; background: white; border-radius: 50%; }
         .hidden-pin-input { position: absolute; opacity: 0; pointer-events: none; }
 
@@ -166,9 +194,9 @@
 
         .app-header {
             position: fixed; top: 0; left: 0; right: 0; height: auto; min-height: 60px;
-            padding-top: env(safe-area-inset-top); 
-            background: rgba(245, 245, 247, 0.85);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding-top: env(safe-area-inset-top); background: rgba(245, 245, 247, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             z-index: 50;
             display: flex; align-items: center; justify-content: space-between;
             padding-left: 20px; padding-right: 20px; padding-bottom: 10px;
@@ -176,24 +204,24 @@
         }
 
         .header-left { display: flex; flex-direction: column; gap: 2px; }
-        .header-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
-        .header-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+        .header-title { font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
+        .header-subtitle { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
 
         .header-right { display: flex; align-items: center; gap: 12px; }
-        .header-nickname { font-size: 13px; font-weight: 600; color: var(--text-primary); padding: 8px 14px; background: rgba(0,0,0,0.06); border-radius: 100px; }
+        .header-nickname { font-size: 13px; font-weight: 600; color: var(--text-primary); padding: 8px 14px; background: var(--bg-card); border-radius: 12px; box-shadow: var(--shadow-sm); }
 
         .logout-btn {
-            width: 40px; height: 40px; border-radius: 50%; border: none;
-            background: rgba(0,0,0,0.05); color: var(--text-secondary); cursor: pointer;
+            width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border-color);
+            background: var(--bg-card); color: var(--text-secondary); cursor: pointer;
             display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
         }
-        .logout-btn:hover { background: var(--danger); color: white; }
+        .logout-btn:active { border-color: var(--text-primary); color: var(--text-primary); }
 
         .app-body {
             flex: 1;
             margin-top: calc(50px + env(safe-area-inset-top) + 10px);
-            margin-bottom: calc(100px + env(safe-area-inset-bottom));
-            padding: 10px 20px;
+            margin-bottom: calc(110px + env(safe-area-inset-bottom));
+            padding: 10px 16px;
             overflow-y: auto; position: relative; z-index: 10;
         }
 
@@ -205,114 +233,127 @@
         .page-container.visible { opacity: 1; transform: translateY(0); }
 
         .app-menu {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 100px;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0,0,0,0.05);
+            position: fixed; bottom: 16px; left: 16px; right: 16px; height: 80px;
+            background: var(--bg-card);
+            border-radius: 24px;
             z-index: 50;
             display: flex; align-items: center; justify-content: center; padding: 10px;
-            padding-bottom: calc(-10px + env(safe-area-inset-bottom));
+            margin-bottom: env(safe-area-inset-bottom);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
         }
 
-        .radio-inputs { position: relative; display: flex; flex-wrap: wrap; border-radius: 24px; background-color: rgba(0,0,0,0.05); padding: 6px; width: 100%; font-size: 14px; }
+        /* Bento Navigation Style */
+        .radio-inputs { position: relative; display: flex; flex-wrap: wrap; border-radius: 16px; background-color: transparent; border: none; box-shadow: none; padding: 4px; width: 100%; font-size: 14px; }
         .radio-inputs .radio { flex: 1 1 auto; text-align: center; }
         .radio-inputs .radio input { display: none; }
-        .radio-inputs .radio .name { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border-radius: 18px; border: none; padding: 12px 8px; color: var(--text-muted); transition: all 0.3s ease-in-out; }
-        .radio-inputs .radio .name svg { width: 22px; height: 22px; stroke-width: 1.5; transition: all 0.3s ease; }
-        .radio-inputs .radio input:checked + .name { background-color: var(--bg-primary); color: var(--text-primary); box-shadow: var(--shadow-sm); }
-        .radio-inputs .radio input:checked + .name svg { opacity: 1; stroke: var(--accent); }
-        .radio-inputs .radio:hover .name { background-color: rgba(255,255,255,0.5); }
-        .menu-label { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+        .radio-inputs .radio .name { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border-radius: 14px; border: none; padding: 10px 8px; color: var(--text-secondary); transition: all 0.2s ease-in-out; }
+        .radio-inputs .radio .name svg { width: 22px; height: 22px; stroke-width: 2; transition: all 0.2s ease; }
+        .radio-inputs .radio input:checked + .name { background-color: var(--bg-app); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow-sm); }
+        .radio-inputs .radio input:checked + .name svg { stroke: var(--accent); opacity: 1; }
+        .radio-inputs .radio:hover .name { background-color: var(--bg-app); }
+        .menu-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
 
         .driver-fields { display: none; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 14px; }
         .driver-fields.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ================= VIEW TOGGLE ================= */
-        .view-toggle-container { padding: 0 0 15px 0; display: flex; justify-content: center; }
-        .view-toggle { display: flex; background: rgba(0,0,0,0.05); border-radius: 12px; padding: 4px; }
+        /* ================= VIEW TOGGLE (Page 1) ================= */
+        .view-toggle-container { padding: 0 0 20px 0; display: flex; justify-content: center; }
+        .view-toggle { display: flex; background: var(--bg-card); border-radius: 16px; padding: 6px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
         .view-toggle-btn {
-            padding: 8px 20px; border: none; background: transparent;
-            color: var(--text-muted); font-size: 14px; font-weight: 600;
-            border-radius: 8px; cursor: pointer; transition: all 0.3s;
+            padding: 10px 20px; border: none; background: transparent;
+            color: var(--text-secondary); font-size: 13px; font-weight: 600;
+            border-radius: 12px; cursor: pointer; transition: all 0.2s;
         }
         .view-toggle-btn.active {
-            background: var(--bg-primary); color: var(--text-primary);
-            box-shadow: var(--shadow-sm);
+            background: var(--text-primary); color: white;
         }
-
-        /* ================= TRIP CARDS (PREMIUM) ================= */
-        .trip-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        /* ================= TRIP CARDS (BENTO STYLE) ================= */
+        .trip-list { display: flex; flex-direction: column; gap: 16px; }
         
         .trip-card-v2 {
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.8);
-            border-radius: 24px;
+            background: var(--bg-card);
+            border-radius: var(--radius-card);
             padding: 20px;
             position: relative;
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
         }
-        .trip-card-v2:active { transform: scale(0.98); }
+        .trip-card-v2:active { transform: scale(0.98); box-shadow: var(--shadow-md); }
 
         /* Row 1: Cities */
         .tc-row-1 {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             position: relative;
             z-index: 2;
         }
         .tc-city-box {
             flex: 1;
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.2;
         }
         .tc-city-box.dest { text-align: right; }
+        .tc-arrow {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
 
-        /* Row 2: Visual Line - Minimalist */
+        /* Row 2: Visual Line - Tech Style */
         .tc-row-2 {
             position: relative;
-            height: 40px;
+            height: 50px;
             display: flex;
             align-items: center;
-            margin: 0 0 16px 0;
+            margin: 0 0 20px 0;
         }
         /* The connecting line */
         .tc-route-line {
             position: absolute;
             left: 0; right: 0;
             top: 50%; height: 1px;
-            background: rgba(0,0,0,0.1);
-            transform: translateY(-50%); z-index: 1;
+            background: var(--border-color);
+            transform: translateY(-50%);
+            z-index: 1;
         }
         /* Progress/Active Line */
         .tc-route-progress {
-            position: absolute; left: 0; width: 50%;
+            position: absolute;
+            left: 0; width: 50%; /* Example */
             top: 50%; height: 1px;
             background: var(--accent);
-            transform: translateY(-50%); z-index: 2;
+            transform: translateY(-50%);
+            z-index: 2;
         }
         /* Points */
         .tc-route-point {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 10px; height: 10px;
-            border-radius: 50%; z-index: 3;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            z-index: 3;
+            border: 2px solid var(--bg-card);
         }
         .tc-point-start {
             left: 0;
-            background: var(--accent);
+            background: var(--text-primary);
+            box-shadow: 0 0 0 2px var(--text-primary);
         }
         .tc-point-end {
             right: 0;
-            background: var(--bg-body);
-            border: 1.5px solid var(--accent);
+            background: white;
+            border: 2px solid var(--border-color);
         }
         /* Car Icon */
         .tc-car-icon {
@@ -320,20 +361,15 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 36px; height: 36px;
-            background: var(--bg-primary);
-            border: 1px solid rgba(0,0,0,0.05);
-            border-radius: 50%;
+            width: 40px; height: 40px;
+            background: var(--text-primary);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 18px;
             z-index: 4;
             box-shadow: var(--shadow-md);
-        }
-        .tc-car-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: var(--text-primary);
         }
 
         /* Row 3: Time & Status */
@@ -341,20 +377,27 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 12px;
-            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 16px;
+            border-top: 1px solid var(--divider);
         }
         .tc-datetime {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .tc-datetime span {
+            display: block;
             font-size: 12px;
             font-weight: 500;
             color: var(--text-secondary);
+            margin-top: 2px;
         }
         .tc-status-badge {
-            background: var(--accent);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 100px;
-            font-size: 10px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -365,60 +408,53 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            margin-top: 12px;
+            margin-top: 16px;
         }
         .tc-int-row {
             display: flex;
             align-items: center;
-            font-size: 13px;
-            background: rgba(0,0,0,0.02);
-            padding: 8px 12px;
-            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-app);
+            padding: 12px 16px;
+            border-radius: 12px;
         }
         .tc-int-city {
             font-weight: 600;
-            color: var(--text-secondary);
-            margin-right: 10px;
+            color: var(--text-primary);
+            margin-right: 12px;
         }
         .tc-int-line {
             flex: 1;
             height: 1px;
-            background: rgba(0,0,0,0.05);
-            margin-right: 10px;
+            background: var(--border-color);
+            margin-right: 12px;
             border-style: dashed;
         }
-        .tc-int-action {
-            margin-left: auto;
-        }
-        .tc-int-pax {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
+        .tc-int-action { margin-left: auto; }
+        .tc-int-pax { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
         .tc-int-book-btn {
             background: transparent;
-            border: 1px solid rgba(0,0,0,0.2);
+            border: 1px solid var(--text-primary);
             color: var(--text-primary);
-            padding: 4px 12px;
-            border-radius: 100px;
-            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .tc-int-book-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
+        .tc-int-book-btn:active {
+            background: var(--text-primary);
             color: white;
         }
 
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-        .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; stroke: var(--border-color); }
 
         /* ================= FAB ================= */
         .fab-container {
             position: fixed;
-            bottom: calc(100px + env(safe-area-inset-bottom) + 20px);
+            bottom: calc(110px + env(safe-area-inset-bottom));
             right: 20px;
             z-index: 60;
             display: none; 
@@ -426,28 +462,28 @@
         .fab-container.visible { display: block; }
         
         .fab-btn {
-            width: 56px; height: 56px; border-radius: 16px; background: var(--accent); border: none;
-            color: white; font-size: 28px; font-weight: 300;
+            width: 64px; height: 64px; border-radius: 20px; background: var(--text-primary); border: none;
+            color: white; font-size: 32px; font-weight: 300;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); cursor: pointer;
+            box-shadow: var(--shadow-lg); cursor: pointer;
             transition: transform 0.2s, background 0.2s;
         }
-        .fab-btn:hover { background: var(--accent-hover); transform: scale(1.05) rotate(90deg); }
+        .fab-btn:active { background: var(--accent); transform: scale(0.9); }
 
         /* ================= MODAL ================= */
         .modal-overlay {
             position: fixed; inset: 0; z-index: 100;
-            background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
             display: flex; align-items: flex-end; justify-content: center;
             opacity: 0; visibility: hidden; transition: opacity 0.3s;
         }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         
         .modal-content {
-            background: var(--bg-body);
+            background: var(--bg-card);
             width: 100%; max-width: 420px; max-height: 90vh;
-            border-radius: 24px 24px 0 0;
+            border-radius: 32px 32px 0 0;
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column;
@@ -455,45 +491,35 @@
         }
         .modal-overlay.visible .modal-content { transform: translateY(0); }
 
-        .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
-        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 4px; }
+        .modal-header { padding: 24px 24px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+        .modal-close { background: var(--bg-app); border: none; color: var(--text-primary); font-size: 18px; cursor: pointer; padding: 8px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
 
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-body { padding: 0 24px 24px; overflow-y: auto; flex: 1; }
 
         .intermediate-input-row {
             display: flex; gap: 8px;
             margin-bottom: 10px;
         }
-        .intermediate-input-row input {
-            flex: 2;
-        }
-        .intermediate-input-row input.price {
-            flex: 1;
-        }
+        .intermediate-input-row input { flex: 2; }
+        .intermediate-input-row input.price { flex: 1; }
 
         /* Toggle Switch */
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
-        .toggle-label { font-size: 14px; color: var(--text-primary); }
-        .switch { position: relative; width: 44px; height: 24px; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--divider); }
+        .toggle-label { font-size: 15px; color: var(--text-primary); font-weight: 500; }
+        .switch { position: relative; width: 48px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: rgba(0,0,0,0.1); transition: .3s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--border-color); transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: var(--shadow-sm); }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        .template-select-container {
-            margin-bottom: 15px;
-        }
+        .template-select-container { margin-bottom: 20px; }
         .template-select {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255,255,255,0.6);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 14px;
+            width: 100%; padding: 14px; background: var(--bg-app);
+            border: 1px solid var(--border-color); color: var(--text-primary);
+            border-radius: var(--radius-input); font-family: inherit; font-size: 15px;
+            font-weight: 500;
         }
 
     </style>
@@ -546,13 +572,13 @@
                                 </div>
 
                                 <div id="loginStep2" style="display:none;">
-                                    <div style="margin-bottom: 12px; font-size: 13px; color: var(--text-muted); text-align: center;">Код отправлен на номер</div>
+                                    <div style="margin-bottom: 16px; font-size: 14px; color: var(--text-secondary); text-align: center;">Код отправлен на номер</div>
                                     <div class="pin-dots-container" onclick="document.getElementById('pinInput').focus()">
                                         <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
                                     </div>
                                     <input type="tel" class="hidden-pin-input" id="pinInput" maxlength="4">
-                                    <p id="loginError" style="color:var(--danger); font-size:12px; text-align:center; margin-top:10px; opacity:0;">Неверный код</p>
-                                    <button type="button" class="submit-btn" id="loginSubmitBtn" style="margin-top:10px;"><span class="btn-text">Войти</span><div class="loader"></div></button>
+                                    <p id="loginError" style="color:#FF3B30; font-size:13px; text-align:center; margin-top:12px; opacity:0; font-weight:600;">Неверный код</p>
+                                    <button type="button" class="submit-btn" id="loginSubmitBtn" style="margin-top:16px;"><span class="btn-text">Войти</span><div class="loader"></div></button>
                                 </div>
                             </form>
                             
@@ -565,12 +591,12 @@
                                     <div class="input-container"><input type="tel" class="styled_input_bar" id="regPhone" placeholder=" " maxlength="18"><label class="input-label" for="regPhone">Телефон</label></div>
 
                                     <div class="driver-fields" id="driverFields">
-                                        <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Данные транспортного средства</div>
+                                        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; font-weight:600; text-transform:uppercase;">Данные транспортного средства</div>
                                         <div class="input-container"><input type="text" class="styled_input_bar" id="regCarModel" placeholder=" "><label class="input-label" for="regCarModel">Марка автомобиля</label></div>
                                         <div class="input-container"><input type="text" class="styled_input_bar" id="regCarColor" placeholder=" "><label class="input-label" for="regCarColor">Цвет автомобиля</label></div>
                                         <div class="input-container"><input type="text" class="styled_input_bar" id="regCarPlate" placeholder=" "><label class="input-label" for="regCarPlate">Гос номер</label></div>
                                         
-                                        <div style="font-size:12px; color:var(--text-muted); margin:10px 0;">Загрузка документов</div>
+                                        <div style="font-size:12px; color:var(--text-secondary); margin:12px 0; font-weight:600; text-transform:uppercase;">Загрузка документов</div>
                                         
                                         <div class="file-upload-area" id="uploadLicense">
                                             <input type="file" id="regFileLicense" accept="image/*">
@@ -593,7 +619,7 @@
                                     </div>
                                 </div>
 
-                                <div id="regError" style="color:var(--danger); font-size:12px; text-align:center; margin-top:10px; opacity:0;"></div>
+                                <div id="regError" style="color:#FF3B30; font-size:13px; text-align:center; margin-top:10px; opacity:0; font-weight:600;"></div>
 
                                 <button type="submit" class="submit-btn" id="regSubmitBtn"><span class="btn-text">Зарегистрироваться</span><div class="loader"></div></button>
                             </form>
@@ -612,7 +638,7 @@
                 <div class="header-right">
                     <span class="header-nickname" id="headerNickname">User</span>
                     <button class="logout-btn" id="logoutBtn" title="Выйти">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                     </button>
                 </div>
             </header>
@@ -660,14 +686,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title">Создать поездку</span>
-                    <button class="modal-close" id="closeCreateTripModal">&times;</button>
+                    <button class="modal-close" id="closeCreateTripModal">×</button>
                 </div>
                 <div class="modal-body">
                     <form id="createTripForm">
                         
                         <!-- Template Selection -->
                         <div class="template-select-container" id="templateSelectContainer" style="display:none;">
-                            <label style="font-size: 12px; color: var(--text-muted); display:block; margin-bottom:5px;">Выбрать шаблон</label>
+                            <label style="font-size: 12px; color: var(--text-secondary); display:block; margin-bottom:8px; font-weight:600; text-transform:uppercase;">Выбрать шаблон</label>
                             <select id="templateSelect" class="template-select">
                                 <option value="">-- Без шаблона --</option>
                             </select>
@@ -683,7 +709,7 @@
                         </div>
                         
                         <!-- Intermediate Points -->
-                        <div style="font-size: 12px; color: var(--text-muted); margin: 10px 0 5px;">Промежуточные пункты (до 4-х)</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin: 16px 0 8px; font-weight:600; text-transform:uppercase;">Промежуточные пункты (до 4-х)</div>
                         <div id="intermediatePointsContainer">
                             <div class="intermediate-input-row">
                                 <input type="text" class="styled_input_bar" id="intPoint1" placeholder="Город">
@@ -703,7 +729,7 @@
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <div style="display: flex; gap: 12px; margin-top: 12px;">
                             <div class="input-container" style="flex: 1;">
                                 <input type="date" class="styled_input_bar" id="tripDate" placeholder=" " required>
                                 <label class="input-label">Дата</label>
@@ -714,7 +740,7 @@
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 12px;">
                             <div class="input-container" style="flex: 1;">
                                 <input type="number" class="styled_input_bar" id="tripPrice" placeholder=" " min="0" required>
                                 <label class="input-label">Цена (руб)</label>
@@ -725,7 +751,7 @@
                             </div>
                         </div>
 
-                        <div style="margin-top: 10px;">
+                        <div style="margin-top: 16px;">
                             <div class="toggle-row">
                                 <span class="toggle-label">Животные</span>
                                 <label class="switch"><input type="checkbox" id="tripAnimals"><span class="slider"></span></label>
@@ -748,7 +774,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="submit-btn" style="margin-top: 20px;"><span class="btn-text">Опубликовать</span><div class="loader"></div></button>
+                        <button type="submit" class="submit-btn" style="margin-top: 24px;"><span class="btn-text">Опубликовать</span><div class="loader"></div></button>
                     </form>
                 </div>
             </div>
@@ -1216,7 +1242,8 @@
                 pageContainer.innerHTML = `
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 8v4l3 3"/></svg>
-                        <div>Активных поездок пока нет</div>
+                        <div style="font-weight:600; color:var(--text-primary); margin-bottom:4px;">Нет доступных поездок</div>
+                        <div style="font-size:13px;">Попробуйте изменить параметры поиска</div>
                     </div>`;
                 return;
             }
@@ -1225,7 +1252,7 @@
             trips.forEach(trip => {
                 const date = new Date(trip.departure_time);
                 const timeStr = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-                const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+                const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
                 
                 // Prepare intermediate points HTML
                 let intHtml = '';
@@ -1233,7 +1260,7 @@
                     intHtml = '<div class="tc-intermediate-list">';
                     trip.intermediate_points.forEach(point => {
                         if (currentViewMode === 'carrier' && trip.driver_id === currentUser.id) {
-                            // Driver View: Show passenger count
+                            // Driver View
                             intHtml += `
                                 <div class="tc-int-row">
                                     <span class="tc-int-city">${point.name}</span>
@@ -1244,7 +1271,7 @@
                                 </div>
                             `;
                         } else {
-                            // Passenger View: Show Book Button
+                            // Passenger View
                             intHtml += `
                                 <div class="tc-int-row">
                                     <span class="tc-int-city">${point.name}</span>
@@ -1264,6 +1291,7 @@
                         <!-- Row 1: Cities -->
                         <div class="tc-row-1">
                             <div class="tc-city-box">${trip.origin_city}</div>
+                            <div class="tc-arrow">✈</div>
                             <div class="tc-city-box dest">${trip.destination_city}</div>
                         </div>
                         
@@ -1273,17 +1301,12 @@
                             <div class="tc-route-progress"></div>
                             <div class="tc-route-point tc-point-start"></div>
                             <div class="tc-route-point tc-point-end"></div>
-                            <div class="tc-car-icon">
-                                <!-- Minimalist Car Icon SVG -->
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
-                                </svg>
-                            </div>
+                            <div class="tc-car-icon">🚗</div>
                         </div>
 
                         <!-- Row 3: Time & Status -->
                         <div class="tc-row-3">
-                            <div class="tc-datetime">${timeStr}, ${dateStr}</div>
+                            <div class="tc-datetime">${timeStr} <span>${dateStr}</span></div>
                             <div class="tc-status-badge">Запланирована</div>
                         </div>
 
@@ -1298,7 +1321,7 @@
 
         // Dummy function for intermediate booking
         function handleBookIntermediate(tripId, pointName) {
-            alert(`Вы пытаетесь занять место в поездке ${tripId} до точки ${pointName}. Функционал бронирования будет реализован позже.`);
+            alert(`Бронирование места в поездке ${tripId} до ${pointName}. Функционал в разработке.`);
         }
 
     </script>
