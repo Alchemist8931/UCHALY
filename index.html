@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -84,22 +83,7 @@
         .tab-container .tab:checked + .tab_label { color: var(--text-primary); }
         .tab-container .tab--register:checked ~ .indicator { left: 50%; }
         
-        .sub-tab-container { 
-            position: absolute; 
-            top: calc(100% + 12px); 
-            right: 23px; 
-            width: calc(50% - 3px); 
-            display: flex; 
-            padding: 2px; 
-            background-color: var(--bg-primary); 
-            border-radius: 10px; 
-            border: 1px solid var(--border-color); 
-            z-index: 10; 
-            opacity: 0; 
-            transform: translateY(-10px); 
-            pointer-events: none; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
+        .sub-tab-container { position: absolute; top: calc(100% + 12px); right: 23px; width: calc(50% - 3px); display: flex; padding: 2px; background-color: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color); z-index: 10; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .auth-card.is-register .sub-tab-container { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .sub-tab-container .indicator-sub { width: calc(50% - 2px); height: 28px; background: var(--bg-elevated); position: absolute; top: 2px; left: 2px; z-index: 9; border-radius: 8px; transition: all 0.3s ease; }
         .sub-tab-container .sub-tab { width: 50%; height: 28px; position: absolute; z-index: 99; opacity: 0; cursor: pointer; }
@@ -132,11 +116,7 @@
         .input-label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; font-family: inherit; color: var(--text-muted); pointer-events: none; transition: all 0.3s ease; background: transparent; padding: 0 6px; }
         .styled_input_bar:focus + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: 0; left: 12px; font-size: 12px; font-weight: 500; background-color: var(--bg-card); color: var(--accent); }
 
-        .file-upload-area {
-            border: 1px dashed var(--border-color); border-radius: var(--radius-base); padding: 12px;
-            text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 14px;
-            position: relative; overflow: hidden;
-        }
+        .file-upload-area { border: 1px dashed var(--border-color); border-radius: var(--radius-base); padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 14px; position: relative; overflow: hidden; }
         .file-upload-area:hover { border-color: var(--accent); background: rgba(0, 230, 118, 0.05); }
         .file-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
         .file-upload-text { font-size: 13px; color: var(--text-secondary); }
@@ -196,7 +176,7 @@
 
         .page-container {
             background: transparent; border-radius: var(--radius-lg);
-            min-height: calc(100% - 20px); padding: 0; /* Removed padding for list cards */
+            min-height: calc(100% - 20px); padding: 0; 
             opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .page-container.visible { opacity: 1; transform: translateY(0); }
@@ -222,73 +202,178 @@
         .driver-fields.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ================= TRIP CARDS & LIST ================= */
+        /* ================= VIEW TOGGLE (Page 1) ================= */
+        .view-toggle-container {
+            padding: 0 0 15px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .view-toggle {
+            display: flex;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid var(--border-color);
+        }
+        .view-toggle-btn {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .view-toggle-btn.active {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* ================= TRIP CARDS V2 ================= */
         .trip-list { display: flex; flex-direction: column; gap: 12px; }
         
-        .trip-card {
+        .trip-card-v2 {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-base);
-            padding: 16px;
+            padding: 10px; /* Отступ от границ карточки */
             position: relative;
             overflow: hidden;
             transition: transform 0.2s;
         }
-        .trip-card:active { transform: scale(0.98); }
+        .trip-card-v2:active { transform: scale(0.98); }
 
-        .trip-route { display: flex; align-items: center; margin-bottom: 12px; }
-        .trip-point { flex: 1; display: flex; flex-direction: column; }
-        .trip-point-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
-        .trip-point-city { font-size: 16px; font-weight: 600; color: var(--text-primary); }
-        .trip-arrow { padding: 0 10px; color: var(--text-muted); }
+        /* Row 1: Cities */
+        .tc-row-1 {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .tc-city-box {
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        /* Border separation simulation via margin if needed, but user asked margin 10px inside card */
 
-        .trip-details { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border-color); }
-        .trip-info { display: flex; flex-direction: column; gap: 4px; }
-        .trip-time { font-size: 14px; font-weight: 600; color: var(--accent); }
-        .trip-seats { font-size: 12px; color: var(--text-muted); }
+        /* Row 2: Visual Line */
+        .tc-row-2 {
+            display: flex;
+            align-items: center;
+            height: 24px;
+            margin-bottom: 8px;
+        }
+        .tc-line {
+            height: 6px;
+            background-color: var(--accent);
+        }
+        .tc-line-solid { flex: 1; border-radius: 3px 0 0 3px; }
+        .tc-car-icon {
+            width: 24px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tc-line-dashed { 
+            flex: 1; 
+            background: transparent;
+            border-top: 3px dashed var(--accent);
+            border-bottom: 3px dashed var(--accent);
+            height: 0;
+            border-radius: 0 3px 3px 0;
+            opacity: 0.5;
+        }
 
-        .trip-price { text-align: right; }
-        .trip-price-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
-        .trip-price-label { font-size: 11px; color: var(--text-muted); }
+        /* Row 3: Time & Status */
+        .tc-row-3 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .tc-datetime {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .tc-status-badge {
+            background: var(--accent);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
 
-        .trip-driver-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
+        /* Intermediate Points */
+        .tc-intermediate-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .tc-int-row {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        .tc-int-city {
+            font-weight: 500;
+            width: 30%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 5px;
+        }
+        .tc-int-line {
+            flex: 1;
+            height: 1px;
+            background: var(--accent);
+            opacity: 0.3;
+            margin-right: 10px;
+        }
+        .tc-int-action {
+            width: 35%;
+            text-align: right;
+        }
+        .tc-int-pax {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .tc-int-book-btn {
             background: var(--bg-elevated);
+            border: 1px solid var(--accent);
+            color: var(--accent);
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 11px;
-            color: var(--text-secondary);
+            cursor: pointer;
         }
 
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
         .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5; }
 
-        /* ================= FAB (Floating Action Button) ================= */
+        /* ================= FAB ================= */
         .fab-container {
             position: fixed;
-            bottom: calc(100px + env(safe-area-inset-bottom) + 20px); /* Above menu */
+            bottom: calc(100px + env(safe-area-inset-bottom) + 20px);
             right: 20px;
             z-index: 60;
-            display: none; /* Hidden by default */
+            display: none; 
         }
         .fab-container.visible { display: block; }
         
         .fab-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            background: var(--accent);
-            border: none;
-            color: #000;
-            font-size: 28px;
-            font-weight: 300;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 230, 118, 0.4);
-            cursor: pointer;
+            width: 56px; height: 56px; border-radius: 16px; background: var(--accent); border: none;
+            color: #000; font-size: 28px; font-weight: 300;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 230, 118, 0.4); cursor: pointer;
             transition: transform 0.2s, background 0.2s;
         }
         .fab-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
@@ -305,38 +390,34 @@
         
         .modal-content {
             background: var(--bg-card);
-            width: 100%;
-            max-width: 420px;
-            max-height: 90vh;
+            width: 100%; max-width: 420px; max-height: 90vh;
             border-radius: 24px 24px 0 0;
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border-color);
-            border-bottom: none;
+            display: flex; flex-direction: column;
+            border: 1px solid var(--border-color); border-bottom: none;
         }
         .modal-overlay.visible .modal-content { transform: translateY(0); }
 
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .modal-title { font-size: 18px; font-weight: 700; }
-        .modal-close {
-            background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 4px;
-        }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 4px; }
 
         .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
 
-        /* Toggle Switch */
-        .toggle-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid var(--border-color);
+        .intermediate-input-row {
+            display: flex; gap: 8px;
+            margin-bottom: 10px;
         }
+        .intermediate-input-row input {
+            flex: 2;
+        }
+        .intermediate-input-row input.price {
+            flex: 1;
+        }
+
+        /* Toggle Switch */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
         .toggle-label { font-size: 14px; }
         .switch { position: relative; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -344,6 +425,18 @@
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
+
+        .template-select-container {
+            margin-bottom: 15px;
+        }
+        .template-select {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+        }
 
     </style>
 </head>
@@ -468,11 +561,11 @@
 
             <main class="app-body" id="appBody">
                 <div class="page-container visible" id="pageContainer">
-                    <!-- Trip List will be injected here -->
+                    <!-- Content injected by JS -->
                 </div>
             </main>
 
-            <!-- FAB Button (Visible for Drivers) -->
+            <!-- FAB Button (Visible for Drivers only) -->
             <div class="fab-container" id="fabContainer">
                 <button class="fab-btn" id="openCreateTripModal">+</button>
             </div>
@@ -513,6 +606,15 @@
                 </div>
                 <div class="modal-body">
                     <form id="createTripForm">
+                        
+                        <!-- Template Selection -->
+                        <div class="template-select-container" id="templateSelectContainer" style="display:none;">
+                            <label style="font-size: 12px; color: var(--text-muted); display:block; margin-bottom:5px;">Выбрать шаблон</label>
+                            <select id="templateSelect" class="template-select">
+                                <option value="">-- Без шаблона --</option>
+                            </select>
+                        </div>
+
                         <div class="input-container">
                             <input type="text" class="styled_input_bar" id="tripOrigin" placeholder=" " required>
                             <label class="input-label">Откуда</label>
@@ -522,7 +624,28 @@
                             <label class="input-label">Куда</label>
                         </div>
                         
-                        <div style="display: flex; gap: 10px;">
+                        <!-- Intermediate Points -->
+                        <div style="font-size: 12px; color: var(--text-muted); margin: 10px 0 5px;">Промежуточные пункты (до 4-х)</div>
+                        <div id="intermediatePointsContainer">
+                            <div class="intermediate-input-row">
+                                <input type="text" class="styled_input_bar" id="intPoint1" placeholder="Город">
+                                <input type="number" class="styled_input_bar price" id="intPrice1" placeholder="Цена">
+                            </div>
+                            <div class="intermediate-input-row">
+                                <input type="text" class="styled_input_bar" id="intPoint2" placeholder="Город">
+                                <input type="number" class="styled_input_bar price" id="intPrice2" placeholder="Цена">
+                            </div>
+                            <div class="intermediate-input-row">
+                                <input type="text" class="styled_input_bar" id="intPoint3" placeholder="Город">
+                                <input type="number" class="styled_input_bar price" id="intPrice3" placeholder="Цена">
+                            </div>
+                            <div class="intermediate-input-row">
+                                <input type="text" class="styled_input_bar" id="intPoint4" placeholder="Город">
+                                <input type="number" class="styled_input_bar price" id="intPrice4" placeholder="Цена">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
                             <div class="input-container" style="flex: 1;">
                                 <input type="date" class="styled_input_bar" id="tripDate" placeholder=" " required>
                                 <label class="input-label">Дата</label>
@@ -561,6 +684,10 @@
                                 <span class="toggle-label">Мгновенное бронирование</span>
                                 <label class="switch"><input type="checkbox" id="tripInstant"><span class="slider"></span></label>
                             </div>
+                            <div class="toggle-row">
+                                <span class="toggle-label">Сохранить как шаблон</span>
+                                <label class="switch"><input type="checkbox" id="saveAsTemplate"><span class="slider"></span></label>
+                            </div>
                         </div>
 
                         <button type="submit" class="submit-btn" style="margin-top: 20px;"><span class="btn-text">Опубликовать</span><div class="loader"></div></button>
@@ -588,6 +715,7 @@
 
         const TEST_PIN = '1234';
         let currentUser = null;
+        let currentViewMode = 'passenger'; // 'passenger' or 'carrier'
 
         // ==========================================
         // DOM ELEMENTS
@@ -608,7 +736,7 @@
         const pageContainer = document.getElementById('pageContainer');
 
         // ==========================================
-        // TAB SWITCHING LOGIC
+        // TAB SWITCHING LOGIC (Auth)
         // ==========================================
         tabLogin.addEventListener('change', () => { if (tabLogin.checked) authCard.classList.remove('is-register'); });
         tabRegister.addEventListener('change', () => { if (tabRegister.checked) authCard.classList.add('is-register'); });
@@ -802,7 +930,7 @@
             setTimeout(() => {
                 appContainer.classList.add('visible');
                 updateUI();
-                loadTrips(); // Load trips on app show
+                initPageView(); // Initialize Page 1 View
             }, 400);
         }
 
@@ -829,18 +957,50 @@
             if (currentUser) {
                 const name = currentUser.first_name || 'User';
                 headerNickname.textContent = name;
-                document.getElementById('pageTitle').textContent = "Добро пожаловать, " + name;
-                
-                // Show FAB if user is a driver
-                if (currentUser.role === 'driver') {
-                    fabContainer.classList.add('visible');
-                } else {
-                    fabContainer.classList.remove('visible');
-                }
             }
         }
 
         document.getElementById('logoutBtn').addEventListener('click', hideApp);
+
+        // --- Page 1 View Logic ---
+        function initPageView() {
+            // Create Toggle if not exists
+            if (!document.getElementById('viewToggleContainer')) {
+                const toggleHtml = `
+                    <div class="view-toggle-container" id="viewToggleContainer">
+                        <div class="view-toggle">
+                            <button class="view-toggle-btn active" id="btnPassMode" type="button">Я пассажир</button>
+                            <button class="view-toggle-btn" id="btnCarrierMode" type="button">Я перевозчик</button>
+                        </div>
+                    </div>
+                `;
+                pageContainer.insertAdjacentHTML('beforebegin', toggleHtml);
+                
+                document.getElementById('btnPassMode').addEventListener('click', () => setViewMode('passenger'));
+                document.getElementById('btnCarrierMode').addEventListener('click', () => setViewMode('carrier'));
+            }
+
+            // Default mode
+            setViewMode('passenger');
+        }
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            const btnPass = document.getElementById('btnPassMode');
+            const btnCar = document.getElementById('btnCarrierMode');
+
+            if (mode === 'carrier') {
+                btnPass.classList.remove('active');
+                btnCar.classList.add('active');
+                fabContainer.classList.add('visible'); // Show FAB for carrier
+                loadTemplates(); // Load templates for driver
+            } else {
+                btnPass.classList.add('active');
+                btnCar.classList.remove('active');
+                fabContainer.classList.remove('visible'); // Hide FAB for passenger
+            }
+            loadTrips(); // Reload trips to update view (buttons/labels)
+        }
 
         // --- Modal Controls ---
         document.getElementById('openCreateTripModal').addEventListener('click', () => {
@@ -855,6 +1015,54 @@
             if (e.target === createTripModal) createTripModal.classList.remove('visible');
         });
 
+        // --- Templates ---
+        async function loadTemplates() {
+            if (!currentUser) return;
+            const { data, error } = await db.from('uchaly_trip_templates').select('*').eq('driver_id', currentUser.id);
+            
+            const select = document.getElementById('templateSelect');
+            const container = document.getElementById('templateSelectContainer');
+            
+            select.innerHTML = '<option value="">-- Без шаблона --</option>';
+            
+            if (data && data.length > 0) {
+                container.style.display = 'block';
+                data.forEach(tpl => {
+                    const opt = document.createElement('option');
+                    opt.value = JSON.stringify(tpl);
+                    opt.textContent = tpl.template_name || `${tpl.origin_city} -> ${tpl.destination_city}`;
+                    select.appendChild(opt);
+                });
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        document.getElementById('templateSelect').addEventListener('change', (e) => {
+            if (!e.target.value) return;
+            try {
+                const tpl = JSON.parse(e.target.value);
+                document.getElementById('tripOrigin').value = tpl.origin_city || '';
+                document.getElementById('tripDestination').value = tpl.destination_city || '';
+                document.getElementById('tripPrice').value = tpl.price || '';
+                document.getElementById('tripSeats').value = tpl.total_seats || 3;
+                document.getElementById('tripAnimals').checked = tpl.allows_animals;
+                document.getElementById('tripChildSeat').checked = tpl.has_child_seat;
+                document.getElementById('tripCourier').checked = tpl.accepts_courier;
+                document.getElementById('tripInstant').checked = tpl.is_instant_booking;
+
+                // Fill intermediates
+                if (tpl.intermediate_points) {
+                    tpl.intermediate_points.forEach((p, i) => {
+                        if (i < 4) {
+                            document.getElementById(`intPoint${i+1}`).value = p.name;
+                            document.getElementById(`intPrice${i+1}`).value = p.price || '';
+                        }
+                    });
+                }
+            } catch (err) { console.error("Error parsing template", err); }
+        });
+
         // --- Create Trip Logic ---
         document.getElementById('createTripForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -863,10 +1071,17 @@
 
             const dateVal = document.getElementById('tripDate').value;
             const timeVal = document.getElementById('tripTime').value;
-            
-            // Construct ISO timestamp (assuming local time for simplicity, adjust as needed)
-            // Note: Supabase expects ISO string usually.
             const departureTimestamp = new Date(`${dateVal}T${timeVal}`).toISOString();
+
+            // Collect intermediate points
+            let intermediatePoints = [];
+            for (let i = 1; i <= 4; i++) {
+                const city = document.getElementById(`intPoint${i}`).value.trim();
+                const price = document.getElementById(`intPrice${i}`).value;
+                if (city) {
+                    intermediatePoints.push({ name: city, price: parseInt(price) || 0, passengers: 0 });
+                }
+            }
 
             const tripData = {
                 driver_id: currentUser.id,
@@ -876,6 +1091,7 @@
                 price: parseInt(document.getElementById('tripPrice').value),
                 total_seats: parseInt(document.getElementById('tripSeats').value),
                 available_seats: parseInt(document.getElementById('tripSeats').value),
+                intermediate_points: intermediatePoints, // Save array
                 allows_animals: document.getElementById('tripAnimals').checked,
                 has_child_seat: document.getElementById('tripChildSeat').checked,
                 accepts_courier: document.getElementById('tripCourier').checked,
@@ -884,12 +1100,35 @@
             };
 
             try {
-                const { error } = await db.from('uchaly_trips').insert([tripData]);
-                if (error) throw error;
+                // 1. Insert Trip
+                const { error: tripError } = await db.from('uchaly_trips').insert([tripData]);
+                if (tripError) throw tripError;
+
+                // 2. Save Template if checked
+                if (document.getElementById('saveAsTemplate').checked) {
+                    const templateData = {
+                        driver_id: currentUser.id,
+                        template_name: `${tripData.origin_city} - ${tripData.destination_city}`,
+                        origin_city: tripData.origin_city,
+                        destination_city: tripData.destination_city,
+                        intermediate_points: tripData.intermediate_points,
+                        price: tripData.price,
+                        total_seats: tripData.total_seats,
+                        allows_animals: tripData.allows_animals,
+                        has_child_seat: tripData.has_child_seat,
+                        accepts_courier: tripData.accepts_courier,
+                        is_instant_booking: tripData.is_instant_booking
+                    };
+                    
+                    const { error: tplError } = await db.from('uchaly_trip_templates').insert([templateData]);
+                    if (tplError) console.error("Template save error", tplError); // Not critical
+                }
                 
                 createTripModal.classList.remove('visible');
                 document.getElementById('createTripForm').reset();
                 loadTrips(); // Refresh list
+                loadTemplates(); // Refresh templates list
+
             } catch (err) {
                 alert("Ошибка создания поездки: " + err.message);
             } finally {
@@ -899,20 +1138,14 @@
 
         // --- Load & Render Trips ---
         async function loadTrips() {
-            // Fetch active trips
-            // We also need driver info, Supabase allows joins if foreign key is set
-            // But since RLS is off and simple select is used, let's fetch with join if possible or manually match.
-            // To keep it simple for now without complex joins setup in SQL (though we added FK):
-            
             let { data: trips, error } = await db
                 .from('uchaly_trips')
-                .select('*, driver:uchaly_users(first_name, car_model, car_color)') // This works if FK name matches
+                .select('*, driver:uchaly_users(first_name, car_model, car_color)') 
                 .eq('status', 'active')
                 .order('departure_time', { ascending: true });
 
             if (error) {
                 console.error("Load error", error);
-                // Fallback if join fails due to naming, just fetch trips
                 let res = await db.from('uchaly_trips').select('*').eq('status', 'active');
                 trips = res.data;
             }
@@ -934,43 +1167,73 @@
             trips.forEach(trip => {
                 const date = new Date(trip.departure_time);
                 const timeStr = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-                const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+                const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) + ' г.';
                 
-                // Driver info handling (depending on if join worked)
-                // If join worked: trip.driver is object. If not, we need to fetch user separately (skipped for simplicity).
-                // Let's assume trip.driver might be null or object.
-                const driverName = trip.driver ? trip.driver.first_name : (currentUser && trip.driver_id === currentUser.id ? currentUser.first_name : 'Водитель');
-                const carInfo = trip.driver && trip.driver.car_model ? `${trip.driver.car_model} ${trip.driver.car_color}` : '';
+                // Prepare intermediate points HTML
+                let intHtml = '';
+                if (trip.intermediate_points && trip.intermediate_points.length > 0) {
+                    intHtml = '<div class="tc-intermediate-list">';
+                    trip.intermediate_points.forEach(point => {
+                        if (currentViewMode === 'carrier' && trip.driver_id === currentUser.id) {
+                            // Driver View: Show passenger count
+                            intHtml += `
+                                <div class="tc-int-row">
+                                    <span class="tc-int-city">${point.name}</span>
+                                    <span class="tc-int-line"></span>
+                                    <div class="tc-int-action">
+                                        <span class="tc-int-pax">${point.passengers || 0} пасс.</span>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            // Passenger View: Show Book Button
+                            intHtml += `
+                                <div class="tc-int-row">
+                                    <span class="tc-int-city">${point.name}</span>
+                                    <span class="tc-int-line"></span>
+                                    <div class="tc-int-action">
+                                        <button class="tc-int-book-btn" onclick="handleBookIntermediate('${trip.id}', '${point.name}')">Занять место</button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                    intHtml += '</div>';
+                }
 
                 html += `
-                    <div class="trip-card">
-                        <div class="trip-driver-badge">${driverName}</div>
-                        <div class="trip-route">
-                            <div class="trip-point">
-                                <span class="trip-point-label">Откуда</span>
-                                <span class="trip-point-city">${trip.origin_city}</span>
-                            </div>
-                            <div class="trip-arrow">→</div>
-                            <div class="trip-point">
-                                <span class="trip-point-label">Куда</span>
-                                <span class="trip-point-city">${trip.destination_city}</span>
-                            </div>
+                    <div class="trip-card-v2">
+                        <!-- Row 1 -->
+                        <div class="tc-row-1">
+                            <div class="tc-city-box">${trip.origin_city}</div>
+                            <div class="tc-city-box" style="text-align: right;">${trip.destination_city}</div>
                         </div>
-                        <div class="trip-details">
-                            <div class="trip-info">
-                                <span class="trip-time">${dateStr}, ${timeStr}</span>
-                                <span class="trip-seats">${trip.available_seats} из ${trip.total_seats} мест • ${carInfo}</span>
-                            </div>
-                            <div class="trip-price">
-                                <span class="trip-price-value">${trip.price} ₽</span>
-                                <span class="trip-price-label">за место</span>
-                            </div>
+                        
+                        <!-- Row 2 -->
+                        <div class="tc-row-2">
+                            <div class="tc-line tc-line-solid"></div>
+                            <div class="tc-car-icon">🚗</div>
+                            <div class="tc-line tc-line-dashed"></div>
                         </div>
+
+                        <!-- Row 3 -->
+                        <div class="tc-row-3">
+                            <div class="tc-datetime">${timeStr}, ${dateStr}</div>
+                            <div class="tc-status-badge">Запланирована</div>
+                        </div>
+
+                        <!-- Intermediate Points -->
+                        ${intHtml}
                     </div>
                 `;
             });
             html += '</div>';
             pageContainer.innerHTML = html;
+        }
+
+        // Dummy function for intermediate booking
+        function handleBookIntermediate(tripId, pointName) {
+            alert(`Вы пытаетесь занять место в поездке ${tripId} до точки ${pointName}. Функционал бронирования будет реализован позже.`);
         }
 
     </script>
