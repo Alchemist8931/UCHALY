@@ -429,267 +429,302 @@
         // ==========================================
         const SUPABASE_URL = "https://ncdwlmgwljjwpuawlssr.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jZHdsbWd3bGpqd3B1YXdsc3NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NTQxNDksImV4cCI6MjA4MzAzMDE0OX0.rrIznUflWydylTnUZvOxOkeF9eMp91qNN4Bjq2gXRL8";
-        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const TEST_PIN = '1234';
-        let currentUser = null;
-
-        // ==========================================
-        // DOM ELEMENTS
-        // ==========================================
-        const authCard = document.getElementById('authCard');
-        const authOverlay = document.getElementById('authOverlay');
-        const appContainer = document.getElementById('appContainer');
-        const tabLogin = document.getElementById('tabLogin');
-        const tabRegister = document.getElementById('tabRegister');
-        const rolePassenger = document.getElementById('rolePassenger');
-        const roleDriver = document.getElementById('roleDriver');
-        const driverFields = document.getElementById('driverFields');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const headerNickname = document.getElementById('headerNickname');
-
-        // ==========================================
-        // TAB SWITCHING LOGIC
-        // ==========================================
-        tabLogin.addEventListener('change', () => { if (tabLogin.checked) authCard.classList.remove('is-register'); });
-        tabRegister.addEventListener('change', () => { if (tabRegister.checked) authCard.classList.add('is-register'); });
         
-        // Role Switching Logic
-        rolePassenger.addEventListener('change', () => { if(rolePassenger.checked) driverFields.classList.remove('active'); });
-        roleDriver.addEventListener('change', () => { if(roleDriver.checked) driverFields.classList.add('active'); });
+        let db;
+    try {
+        db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } catch(e) {
+        alert("Ошибка инициализации Supabase. Проверьте правильность URL и Key.");
+        console.error(e);
+    }
 
-        // ==========================================
-        // PHONE MASK
-        // ==========================================
-        function formatPhone(val) {
-            let input = val.replace(/\D/g, '');
-            if (input.length > 0) {
-                if (input[0] === '8' || input[0] === '7') input = input.substring(1);
-                let f = '+7';
-                if (input.length > 0) f += ' (' + input.substring(0, 3);
-                if (input.length > 3) f += ') ' + input.substring(3, 6);
-                if (input.length > 6) f += '-' + input.substring(6, 8);
-                if (input.length > 8) f += '-' + input.substring(8, 10);
-                return f;
-            }
-            return '';
+    const TEST_PIN = '1234';
+    let currentUser = null;
+
+    // ==========================================
+    // DOM ELEMENTS
+    // ==========================================
+    const authCard = document.getElementById('authCard');
+    const authOverlay = document.getElementById('authOverlay');
+    const appContainer = document.getElementById('appContainer');
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const rolePassenger = document.getElementById('rolePassenger');
+    const roleDriver = document.getElementById('roleDriver');
+    const driverFields = document.getElementById('driverFields');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const headerNickname = document.getElementById('headerNickname');
+
+    // ==========================================
+    // TAB SWITCHING LOGIC
+    // ==========================================
+    tabLogin.addEventListener('change', () => { if (tabLogin.checked) authCard.classList.remove('is-register'); });
+    tabRegister.addEventListener('change', () => { if (tabRegister.checked) authCard.classList.add('is-register'); });
+    
+    rolePassenger.addEventListener('change', () => { if(rolePassenger.checked) driverFields.classList.remove('active'); });
+    roleDriver.addEventListener('change', () => { if(roleDriver.checked) driverFields.classList.add('active'); });
+
+    // ==========================================
+    // PHONE MASK
+    // ==========================================
+    function formatPhone(val) {
+        let input = val.replace(/\D/g, '');
+        if (input.length > 0) {
+            if (input[0] === '8' || input[0] === '7') input = input.substring(1);
+            let f = '+7';
+            if (input.length > 0) f += ' (' + input.substring(0, 3);
+            if (input.length > 3) f += ') ' + input.substring(3, 6);
+            if (input.length > 6) f += '-' + input.substring(6, 8);
+            if (input.length > 8) f += '-' + input.substring(8, 10);
+            return f;
         }
+        return '';
+    }
 
-        function setupPhoneInput(id) {
-            const el = document.getElementById(id);
-            el.addEventListener('input', (e) => {
-                e.target.value = formatPhone(e.target.value);
-            });
-        }
-        
-        setupPhoneInput('loginPhone');
-        setupPhoneInput('regPhone');
+    function setupPhoneInput(id) {
+        const el = document.getElementById(id);
+        el.addEventListener('input', (e) => {
+            e.target.value = formatPhone(e.target.value);
+        });
+    }
+    
+    setupPhoneInput('loginPhone');
+    setupPhoneInput('regPhone');
 
-        // ==========================================
-        // FILE UPLOAD HELPER
-        // ==========================================
-        async function uploadFile(fileInputId, bucketName, folderPath) {
-            const fileInput = document.getElementById(fileInputId);
-            const file = fileInput.files[0];
-            if (!file) return null;
+    // ==========================================
+    // FILE UPLOAD HELPER (WITH ERROR HANDLING)
+    // ==========================================
+    async function uploadFile(fileInputId, bucketName, folderPath) {
+        const fileInput = document.getElementById(fileInputId);
+        const file = fileInput.files[0];
+        if (!file) return null;
 
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${folderPath}/${Date.now()}.${fileExt}`;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${folderPath}/${Date.now()}.${fileExt}`;
 
+        try {
             const { data, error } = await db.storage
                 .from(bucketName)
                 .upload(fileName, file);
 
             if (error) {
-                console.error('Upload error:', error);
-                return null;
+                // Выводим реальную ошибку Supabase
+                console.error('Upload error details:', error);
+                throw new Error(`Ошибка загрузки файла: ${error.message || JSON.stringify(error)}`);
             }
 
-            // Get Public URL
             const { data: publicUrl } = db.storage
                 .from(bucketName)
                 .getPublicUrl(fileName);
 
             return publicUrl.publicUrl;
+        } catch (err) {
+            // Пробрасываем ошибку выше, чтобы её увидел пользователь
+            throw err;
         }
+    }
 
-        // ==========================================
-        // LOGIN LOGIC
-        // ==========================================
-        const pinInput = document.getElementById('pinInput');
-        const pinDots = document.querySelectorAll('.pin-dot');
-        const loginStep1 = document.getElementById('loginStep1');
-        const loginStep2 = document.getElementById('loginStep2');
+    // ==========================================
+    // LOGIN LOGIC
+    // ==========================================
+    const pinInput = document.getElementById('pinInput');
+    const pinDots = document.querySelectorAll('.pin-dot');
+    const loginStep1 = document.getElementById('loginStep1');
+    const loginStep2 = document.getElementById('loginStep2');
+    
+    document.querySelector('.pin-dots-container').addEventListener('click', () => pinInput.focus());
+
+    document.getElementById('getCodeBtn').addEventListener('click', () => {
+        const phone = document.getElementById('loginPhone').value;
+        if (phone.length === 18) {
+            loginStep1.style.display = 'none';
+            loginStep2.style.display = 'block';
+            pinInput.focus();
+        } else {
+            alert("Введите корректный номер");
+        }
+    });
+
+    pinInput.addEventListener('input', async (e) => {
+        let val = e.target.value.replace(/\D/g, '');
+        e.target.value = val;
         
-        document.querySelector('.pin-dots-container').addEventListener('click', () => pinInput.focus());
+        pinDots.forEach((dot, i) => {
+            if (i < val.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        });
+        document.getElementById('loginError').style.opacity = 0;
 
-        document.getElementById('getCodeBtn').addEventListener('click', () => {
-            const phone = document.getElementById('loginPhone').value;
-            if (phone.length === 18) {
-                loginStep1.style.display = 'none';
-                loginStep2.style.display = 'block';
-                pinInput.focus();
+        if (val.length === 4) {
+            if (val === TEST_PIN) {
+                await checkUserInDb(document.getElementById('loginPhone').value);
             } else {
-                alert("Введите корректный номер");
+                document.getElementById('loginError').style.opacity = 1;
+                pinInput.value = '';
+                pinDots.forEach(d => d.classList.remove('filled'));
             }
-        });
+        }
+    });
 
-        pinInput.addEventListener('input', async (e) => {
-            let val = e.target.value.replace(/\D/g, '');
-            e.target.value = val;
-            
-            pinDots.forEach((dot, i) => {
-                if (i < val.length) dot.classList.add('filled');
-                else dot.classList.remove('filled');
-            });
-            document.getElementById('loginError').style.opacity = 0;
-
-            if (val.length === 4) {
-                if (val === TEST_PIN) {
-                    await checkUserInDb(document.getElementById('loginPhone').value);
-                } else {
-                    document.getElementById('loginError').style.opacity = 1;
-                    pinInput.value = '';
-                    pinDots.forEach(d => d.classList.remove('filled'));
-                }
-            }
-        });
-
-        async function checkUserInDb(phone) {
+    async function checkUserInDb(phone) {
+        try {
             const { data, error } = await db.from('uchaly_users').select('*').eq('phone', phone).single();
+            
+            if (error && error.code !== 'PGRST116') throw error; // Если ошибка не "не найдено", бросаем исключение
             
             if (data) {
                 currentUser = data;
                 showApp();
-            } else if (error && error.code === 'PGRST116') {
+            } else {
                 alert("Пользователь не найден. Пожалуйста, зарегистрируйтесь.");
                 tabRegister.checked = true;
                 authCard.classList.add('is-register');
                 document.getElementById('regPhone').value = phone;
-            } else {
-                alert("Ошибка БД: " + error.message);
             }
+        } catch (error) {
+            alert("Ошибка соединения с БД: " + error.message);
+        }
+    }
+
+    // ==========================================
+    // REGISTRATION LOGIC
+    // ==========================================
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('regSubmitBtn');
+        
+        const isDriver = roleDriver.checked;
+        const phone = document.getElementById('regPhone').value;
+        const lastName = document.getElementById('regLastName').value;
+        const firstName = document.getElementById('regFirstName').value;
+        const middleName = document.getElementById('regMiddleName').value;
+
+        if (!phone || !lastName || !firstName) {
+            showError("Заполните обязательные поля"); return;
+        }
+        if (phone.length !== 18) {
+            showError("Некорректный телефон"); return;
         }
 
-        // ==========================================
-        // REGISTRATION LOGIC
-        // ==========================================
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('regSubmitBtn');
-            
-            const isDriver = roleDriver.checked;
-            const phone = document.getElementById('regPhone').value;
-            const lastName = document.getElementById('regLastName').value;
-            const firstName = document.getElementById('regFirstName').value;
-            const middleName = document.getElementById('regMiddleName').value;
+        btn.classList.add('loading');
 
-            if (!phone || !lastName || !firstName) {
-                showError("Заполните обязательные поля"); return;
-            }
-            if (phone.length !== 18) {
-                showError("Некорректный телефон"); return;
-            }
+        let insertData = {
+            phone: phone,
+            last_name: lastName,
+            first_name: firstName,
+            middle_name: middleName,
+            role: isDriver ? 'driver' : 'passenger'
+        };
 
-            btn.classList.add('loading');
-
-            let insertData = {
-                phone: phone,
-                last_name: lastName,
-                first_name: firstName,
-                middle_name: middleName,
-                role: isDriver ? 'driver' : 'passenger'
-            };
-
+        try {
             // If Driver, handle files and extra fields
             if (isDriver) {
                 insertData.car_model = document.getElementById('regCarModel').value;
                 insertData.car_color = document.getElementById('regCarColor').value;
                 insertData.car_plate = document.getElementById('regCarPlate').value;
 
-                // Upload Files
-                const folder = phone.replace(/\D/g, ''); // Folder name by phone number
+                const folder = phone.replace(/\D/g, '');
                 
+                // Загрузка файлов с обработкой ошибок
                 const licenseUrl = await uploadFile('regFileLicense', 'uchaly_docs', folder);
                 if(licenseUrl) insertData.driver_license_url = licenseUrl;
+                else console.warn("Файл прав не загружен");
 
                 const regUrl = await uploadFile('regFileReg', 'uchaly_docs', folder);
                 if(regUrl) insertData.car_reg_url = regUrl;
+                else console.warn("Файл СТС не загружен");
 
                 const carUrl = await uploadFile('regFileCar', 'uchaly_docs', folder);
                 if(carUrl) insertData.car_photo_url = carUrl;
+                else console.warn("Фото авто не загружено");
             }
 
             const { data, error } = await db.from('uchaly_users').insert([insertData]).select().single();
 
+            if (error) throw error;
+
+            currentUser = data;
+            alert("Регистрация успешна!");
+            showApp();
+
+        } catch (err) {
+            console.error(err);
+            // Показываем пользователю реальную ошибку
+            let msg = "Ошибка регистрации";
+            if(err.message) msg = err.message;
+            if(typeof err === 'object') msg = JSON.stringify(err);
+            
+            // Более понятные сообщения
+            if(msg.includes('Failed to fetch') || msg.includes('Load failed')) {
+                msg = "Ошибка сети. Проверьте интернет или доступность Supabase URL.";
+            }
+            if(msg.includes('storage')) {
+                msg = "Ошибка загрузки файлов. Проверьте создание бакета 'uchaly_docs' в SQL.";
+            }
+            if(msg.includes('duplicate key')) {
+                msg = "Этот номер телефона уже зарегистрирован.";
+            }
+            
+            showError(msg);
+        } finally {
             btn.classList.remove('loading');
+        }
+    });
 
-            if (error) {
-                if (error.code === '23505') showError("Номер уже зарегистрирован");
-                else showError(error.message);
-            } else {
-                currentUser = data;
-                alert("Регистрация успешна!");
-                showApp();
+    // Visual feedback for file inputs
+    document.querySelectorAll('.file-upload-area input[type="file"]').forEach(input => {
+        input.addEventListener('change', function() {
+            if(this.files.length > 0) {
+                this.parentElement.classList.add('uploaded');
             }
         });
+    });
 
-        // Visual feedback for file inputs
-        document.querySelectorAll('.file-upload-area input[type="file"]').forEach(input => {
-            input.addEventListener('change', function() {
-                if(this.files.length > 0) {
-                    this.parentElement.classList.add('uploaded');
-                }
-            });
-        });
+    function showError(msg) {
+        const el = document.getElementById('regError');
+        el.textContent = msg;
+        el.style.opacity = 1;
+    }
 
-        function showError(msg) {
-            const el = document.getElementById('regError');
-            el.textContent = msg;
-            el.style.opacity = 1;
+    // ==========================================
+    // APP STATE
+    // ==========================================
+    function showApp() {
+        authOverlay.classList.remove('visible');
+        setTimeout(() => {
+            appContainer.classList.add('visible');
+            updateUI();
+        }, 400);
+    }
+
+    function hideApp() {
+        appContainer.classList.remove('visible');
+        setTimeout(() => {
+            authOverlay.classList.add('visible');
+            loginForm.reset();
+            registerForm.reset();
+            loginStep1.style.display = 'block';
+            loginStep2.style.display = 'none';
+            pinInput.value = '';
+            pinDots.forEach(d => d.classList.remove('filled'));
+            tabLogin.checked = true;
+            authCard.classList.remove('is-register');
+            rolePassenger.checked = true;
+            driverFields.classList.remove('active');
+            
+            document.querySelectorAll('.file-upload-area').forEach(el => el.classList.remove('uploaded'));
+        }, 400);
+    }
+
+    function updateUI() {
+        if (currentUser) {
+            const name = currentUser.first_name || 'User';
+            headerNickname.textContent = name;
+            document.getElementById('pageTitle').textContent = "Добро пожаловать, " + name;
         }
+    }
 
-        // ==========================================
-        // APP STATE
-        // ==========================================
-        function showApp() {
-            authOverlay.classList.remove('visible');
-            setTimeout(() => {
-                appContainer.classList.add('visible');
-                updateUI();
-            }, 400);
-        }
+    document.getElementById('logoutBtn').addEventListener('click', hideApp);
 
-        function hideApp() {
-            appContainer.classList.remove('visible');
-            setTimeout(() => {
-                authOverlay.classList.add('visible');
-                loginForm.reset();
-                registerForm.reset();
-                loginStep1.style.display = 'block';
-                loginStep2.style.display = 'none';
-                pinInput.value = '';
-                pinDots.forEach(d => d.classList.remove('filled'));
-                tabLogin.checked = true;
-                authCard.classList.remove('is-register');
-                rolePassenger.checked = true;
-                driverFields.classList.remove('active');
-                
-                // Reset file upload visuals
-                document.querySelectorAll('.file-upload-area').forEach(el => el.classList.remove('uploaded'));
-            }, 400);
-        }
-
-        function updateUI() {
-            if (currentUser) {
-                const name = currentUser.first_name || 'User';
-                headerNickname.textContent = name;
-                document.getElementById('pageTitle').textContent = "Добро пожаловать, " + name;
-            }
-        }
-
-        document.getElementById('logoutBtn').addEventListener('click', hideApp);
-
-    </script>
-</body>
-</html>
+</script>
