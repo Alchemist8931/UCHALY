@@ -1167,7 +1167,7 @@
             trips.forEach(trip => {
                 const date = new Date(trip.departure_time);
                 const timeStr = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-                const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) + ' г.';
+                const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                 
                 // Prepare intermediate points HTML
                 let intHtml = '';
