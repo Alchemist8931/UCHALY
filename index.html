@@ -4,34 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Едем Учалы</title>
+    
+    <!-- Подключаем Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        /* --- Modern Tech Design System --- */
         :root {
-            --bg-deep: #000000;
-            --bg-surface: #121212;
-            --bg-card: rgba(255, 255, 255, 0.03);
-            --primary: #00E676; /* Neon Green */
-            --primary-dim: rgba(0, 230, 118, 0.1);
+            --bg-deep: #050505;
+            --bg-surface: #0F0F0F;
+            --primary: #00E676;
+            --primary-dim: rgba(0, 230, 118, 0.15);
             --text-main: #FFFFFF;
-            --text-secondary: #8A8A8F;
-            --border-color: rgba(255, 255, 255, 0.08);
+            --text-secondary: #6e6e73;
+            --border-color: rgba(255, 255, 255, 0.1);
             --radius-base: 14px;
-            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --font-mono: 'SF Mono', 'Roboto Mono', monospace;
-            
-            /* Shadows & Glows */
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --glow-primary: 0 0 20px rgba(0, 230, 118, 0.3);
+            --font-main: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: var(--font-main);
@@ -42,40 +32,32 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            /* Градиентное пятно на фоне для атмосферы */
-            background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #000000 70%);
         }
 
-        /* --- App Container --- */
         #app {
             width: 100%;
-            max-width: 420px; /* Чуть уже для идеального вида на мобильных */
+            max-width: 420px;
             height: 100%;
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #050505 70%);
         }
 
-        /* --- Background Animated Elements --- */
+        /* --- Ambient Background --- */
         .bg-glow {
             position: absolute;
-            width: 300px;
-            height: 300px;
+            width: 400px;
+            height: 400px;
             background: var(--primary);
-            filter: blur(100px);
-            opacity: 0.05;
+            filter: blur(120px);
+            opacity: 0.03;
             border-radius: 50%;
             z-index: 0;
-            animation: float 10s infinite ease-in-out;
+            pointer-events: none;
         }
-        .bg-glow.top { top: -150px; left: -50px; }
-        .bg-glow.bottom { bottom: -100px; right: -100px; background: #FFFFFF; opacity: 0.03; }
-
-        @keyframes float {
-            0%, 100% { transform: translate3d(0, 0, 0); }
-            50% { transform: translate3d(20px, 20px, 0); }
-        }
+        .bg-glow.active { top: -150px; left: -100px; }
 
         /* --- Screen Logic --- */
         .screen {
@@ -84,424 +66,376 @@
             left: 0;
             width: 100%;
             height: 100%;
-            display: none;
+            display: flex;
             flex-direction: column;
             z-index: 1;
             opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            transform: scale(0.95);
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
         .screen.active {
-            display: flex;
             opacity: 1;
-            transform: translateY(0);
+            pointer-events: all;
+            transform: scale(1);
             z-index: 10;
         }
 
-        /* --- Welcome Screen Layout --- */
-        .welcome-header {
-            padding: 60px 30px 20px;
+        /* --- Welcome Screen --- */
+        .welcome-screen {
+            justify-content: space-between;
+            padding: 60px 24px 40px;
             text-align: center;
-            position: relative;
-            z-index: 2;
         }
 
-        .brand-tag {
-            display: inline-block;
-            padding: 6px 12px;
+        .logo-icon {
+            width: 60px;
+            height: 60px;
             background: var(--primary-dim);
-            color: var(--primary);
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid rgba(0, 230, 118, 0.2);
         }
 
+        .logo-icon svg { width: 32px; height: 32px; fill: var(--primary); }
+
         .welcome-title {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #B0B0B0 100%);
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #999999 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .welcome-subtitle {
+            font-size: 16px;
             color: var(--text-secondary);
-            font-size: 15px;
-            max-width: 280px;
-            margin: 0 auto;
             line-height: 1.5;
+            max-width: 300px;
+            margin: 0 auto;
         }
 
-        /* --- Vehicle Visual --- */
-        .vehicle-visual {
+        /* --- Vehicle --- */
+        .vehicle-container {
             flex: 1;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             position: relative;
-            min-height: 200px;
-        }
-
-        /* Подложка под авто (дорога/тень) */
-        .road-shadow {
-            position: absolute;
-            bottom: 40px;
-            width: 80%;
-            height: 40px;
-            background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%);
-            filter: blur(10px);
-        }
-
-        .car-svg {
-            width: 100%;
-            max-width: 320px;
-            z-index: 2;
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
-            transform: translateZ(0);
-            transition: transform 0.3s ease;
         }
         
-        /* --- Bottom Action Area --- */
-        .action-panel {
-            padding: 20px 24px 40px;
-            background: linear-gradient(to top, #000000 80%, transparent);
-            z-index: 10;
-        }
-
-        /* --- Forms & Cards --- */
-        .form-card {
-            margin: 20px;
-            padding: 24px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-base);
-            backdrop-filter: blur(20px);
-            box-shadow: var(--shadow-card);
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-            position: relative;
-        }
-
-        .input-label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-field {
+        .car-svg {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-base);
-            color: var(--text-main);
-            font-size: 16px;
-            font-weight: 500;
-            outline: none;
-            transition: all 0.2s;
+            max-width: 300px;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
+            animation: floatCar 4s ease-in-out infinite;
         }
-
-        .input-field:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-dim);
+        
+        @keyframes floatCar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         /* --- Buttons --- */
-        .btn {
+        .btn-main {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             border-radius: var(--radius-base);
             border: none;
-            font-size: 16px;
+            background: var(--primary);
+            color: #000;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            transition: transform 0.1s, opacity 0.2s;
             position: relative;
             overflow: hidden;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 4px 20px rgba(0, 230, 118, 0.3);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 10px rgba(0, 230, 118, 0.3);
-        }
-
-        .btn-secondary {
+        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
+        
+        .btn-outline {
             background: transparent;
-            color: var(--text-main);
             border: 1px solid var(--border-color);
+            color: var(--text-main);
             margin-top: 12px;
         }
-        
-        .btn-text {
-            background: transparent;
-            color: var(--text-secondary);
-            margin-top: 10px;
-            padding: 10px;
-        }
-        .btn-text:active { color: var(--text-main); }
 
-        /* --- Checkbox Modern --- */
-        .checkbox-item {
+        /* --- Auth Screen --- */
+        .auth-screen {
+            justify-content: flex-start;
+            padding: 60px 24px;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-bottom: 40px;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background: #1a1a1a; }
+
+        /* --- Step Container --- */
+        .step-container {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Fixed height for smooth transition */
+        }
+
+        .step {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .step.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .step.hidden-left {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        .input-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 18px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-base);
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-dim);
+        }
+
+        /* --- PIN Dots --- */
+        .pin-dots {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+
+        .pin-dot {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .pin-dot.filled {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .pin-dot.filled::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #000;
+            border-radius: 50%;
+        }
+
+        .pin-input-hidden {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .error-msg {
+            color: #FF453A;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .error-msg.show { opacity: 1; }
+
+        /* --- Registration Form --- */
+        .reg-form { margin-top: 30px; }
+        .reg-form .input-group { margin-bottom: 20px; }
+        
+        /* Checkbox */
+        .checkbox-row {
             display: flex;
             align-items: flex-start;
             cursor: pointer;
-            user-select: none;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
-        
-        .checkmark-box {
-            width: 22px;
-            height: 22px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
+        .checkbox-box {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #333;
+            border-radius: 8px;
             margin-right: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            flex-shrink: 0;
-            background: rgba(255,255,255,0.05);
         }
-
-        .checkbox-item input { display: none; }
-        
-        .checkbox-item input:checked + .checkmark-box {
+        .checkbox-row input:checked + .checkbox-box {
             background: var(--primary);
             border-color: var(--primary);
         }
+        .checkbox-row input:checked + .checkbox-box svg { display: block; }
+        .checkbox-row input { display: none; }
+        .checkbox-text { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+        .checkbox-text a { color: var(--primary); text-decoration: none; }
+        
+        /* Loader */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .btn-main.loading .loader { display: block; margin: auto; }
+        .btn-main.loading .btn-text { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .checkmark-icon {
-            width: 12px;
-            height: 12px;
-            fill: none;
-            stroke: #000;
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .checkbox-item input:checked + .checkmark-box .checkmark-icon {
-            opacity: 1;
-        }
-
-        .checkbox-text {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.4;
-        }
-        
-        .checkbox-text a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        /* --- Header for Login/Register screens --- */
-        .nav-header {
-            padding: 20px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .back-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .header-title-center {
-            flex: 1;
-            text-align: center;
-            font-weight: 600;
-            font-size: 18px;
-            margin-right: 40px; /* Compensate back button */
-        }
-        
-        /* Status Bar Mock (for true-to-life look) */
-        .status-bar {
-            height: 44px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-        }
     </style>
 </head>
 <body>
 
     <div id="app">
-        
-        <!-- Background Ambient -->
-        <div class="bg-glow top"></div>
-        <div class="bg-glow bottom"></div>
+        <div class="bg-glow active"></div>
 
-        <!-- SCREEN 1: WELCOME -->
-        <div id="screen-welcome" class="screen active">
-            <div class="status-bar">
-                <span id="time">9:41</span>
-                <div style="display:flex; gap:5px;">
-                    <!-- Signal, Wifi, Battery Icons -->
-                    <svg width="18" height="12" viewBox="0 0 18 12" fill="white"><path d="M1 9.5C1.5 9 3 8 5 8C7 8 8.5 9 9 9.5M3 11.5C3.2 11.3 4 10.5 5 10.5C6 10.5 6.8 11.3 7 11.5M0 7C0.8 6.2 2.5 5 5 5C7.5 5 9.2 6.2 10 7M12 0H18V12H12V0Z"/></svg>
+        <!-- Screen 1: Welcome -->
+        <div id="screen-welcome" class="screen welcome-screen active">
+            <div>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
                 </div>
-            </div>
-
-            <div class="welcome-header">
-                <div class="brand-tag">Сервис перевозок</div>
                 <h1 class="welcome-title">Едем Учалы</h1>
-                <p class="welcome-subtitle">Быстрые поездки по городу и междугородние рейсы в одном приложении</p>
+                <p class="welcome-subtitle">Удобный сервис совместных поездок. Экономьте время и деньги, путешествуя вместе.</p>
             </div>
 
-            <div class="vehicle-visual">
-                <div class="road-shadow"></div>
-                <!-- Modern SUV SVG -->
+            <div class="vehicle-container">
                 <svg class="car-svg" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Car Body Shadow -->
-                    <path d="M160 300 L200 200 H440 L520 300 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
-                    <!-- Main Body Gradient -->
-                    <defs>
-                        <linearGradient id="carGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#2C2C2E;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#1C1C1E;stop-opacity:1" />
-                        </linearGradient>
-                        <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#3A3A3C;stop-opacity:0.8" />
-                            <stop offset="100%" style="stop-color:#1C1C1E;stop-opacity:0.9" />
-                        </linearGradient>
+                     <defs>
+                        <linearGradient id="carGrad" x1="0%" y1="0%" x2="0%" y2="100%"> <stop offset="0%" style="stop-color:#333" /> <stop offset="100%" style="stop-color:#111" /> </linearGradient>
                     </defs>
                     <!-- Car Body -->
                     <path d="M180 310 L210 210 H460 L520 310 H180 Z" fill="url(#carGrad)"/>
-                    <!-- Windows -->
-                    <path d="M240 210 L260 180 H380 L420 210 Z" fill="url(#glassGrad)"/>
+                    <path d="M240 210 L260 180 H380 L420 210 Z" fill="#222"/>
                     <!-- Wheels -->
-                    <circle cx="240" cy="320" r="32" fill="#1C1C1E" stroke="#3A3A3C" stroke-width="4"/>
-                    <circle cx="240" cy="320" r="16" fill="#2C2C2E"/>
-                    <circle cx="450" cy="320" r="32" fill="#1C1C1E" stroke="#3A3A3C" stroke-width="4"/>
-                    <circle cx="450" cy="320" r="16" fill="#2C2C2E"/>
-                    <!-- Headlights Glow -->
-                    <path d="M520 290 L560 280 L560 300 L520 300 Z" fill="rgba(0,230,118,0.2)"/>
-                    <path d="M180 290 L160 280 L160 300 L180 300 Z" fill="rgba(255,255,255,0.5)"/>
-                    <!-- Light Beam -->
-                    <path d="M560 280 L640 260 L640 320 L560 300 Z" fill="url(#beam)"/>
-                    <defs>
-                        <linearGradient id="beam" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:rgba(0,230,118,0.4);stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:rgba(0,230,118,0);stop-opacity:0" />
-                        </linearGradient>
-                    </defs>
-                    <!-- Accent Lines -->
-                    <path d="M185 300 L200 270 H500 L515 300" stroke="#00E676" stroke-width="1.5" fill="none" opacity="0.5"/>
+                    <circle cx="240" cy="320" r="32" fill="#111" stroke="#333" stroke-width="4"/>
+                    <circle cx="240" cy="320" r="16" fill="#222"/>
+                    <circle cx="450" cy="320" r="32" fill="#111" stroke="#333" stroke-width="4"/>
+                    <circle cx="450" cy="320" r="16" fill="#222"/>
+                    <!-- Accents -->
+                    <path d="M520 290 L560 280 L560 300 L520 300 Z" fill="rgba(0,230,118,0.5)"/>
+                    <path d="M185 300 L200 270 H500 L515 300" stroke="#00E676" stroke-width="2" fill="none" opacity="0.7"/>
                 </svg>
             </div>
 
-            <div class="action-panel">
-                <button class="btn btn-primary" onclick="showScreen('screen-login')">
-                    Войти в аккаунт
-                </button>
-                <button class="btn btn-secondary" onclick="showScreen('screen-register')">
-                    Зарегистрироваться
-                </button>
-            </div>
+            <button class="btn-main" onclick="showScreen('screen-auth')">
+                <span class="btn-text">Начать</span>
+            </button>
         </div>
 
-        <!-- SCREEN 2: LOGIN -->
-        <div id="screen-login" class="screen">
-            <div class="status-bar">
-                <span>9:41</span>
-                <div style="display:flex; gap:5px;"><svg width="18" height="12" viewBox="0 0 18 12" fill="white"><path d="M1 9.5C1.5 9 3 8 5 8C7 8 8.5 9 9 9.5M3 11.5C3.2 11.3 4 10.5 5 10.5C6 10.5 6.8 11.3 7 11.5M0 7C0.8 6.2 2.5 5 5 5C7.5 5 9.2 6.2 10 7M12 0H18V12H12V0Z"/></svg></div>
-            </div>
-            
-            <div class="nav-header">
-                <button class="back-btn" onclick="showScreen('screen-welcome')">‹</button>
-                <div class="header-title-center">Вход</div>
-            </div>
+        <!-- Screen 2: Auth (Phone + Pin) -->
+        <div id="screen-auth" class="screen auth-screen">
+            <button class="back-btn" onclick="goBack()">‹</button>
 
-            <div class="form-card" style="margin-top: 40px;">
-                <div class="input-group">
+            <div class="step-container">
+                <!-- Step 1: Phone -->
+                <div id="step-phone" class="step active">
                     <label class="input-label">Номер телефона</label>
-                    <input type="tel" class="input-field" placeholder="+7 (___) ___-__-__" id="login-phone">
+                    <input type="tel" class="input-field" id="phone-input" placeholder="+7 (___) ___-__-__" autocomplete="off">
+                    <p style="color: var(--text-secondary); font-size: 12px; margin-top: 12px; text-align: center;">На этот номер будет отправлен код</p>
                 </div>
 
-                <div class="input-group">
-                    <label class="input-label">Код из СМС</label>
-                    <input type="text" class="input-field" placeholder="----" id="login-code" maxlength="6" style="letter-spacing: 8px; text-align: center; font-family: var(--font-mono);">
+                <!-- Step 2: PIN -->
+                <div id="step-pin" class="step">
+                    <label class="input-label">Введите код из SMS</label>
+                    <div class="pin-dots" onclick="focusHiddenInput()">
+                        <div class="pin-dot"></div>
+                        <div class="pin-dot"></div>
+                        <div class="pin-dot"></div>
+                        <div class="pin-dot"></div>
+                    </div>
+                    <input type="tel" class="pin-input-hidden" id="pin-input" maxlength="4">
+                    <p style="color: var(--text-secondary); font-size: 12px; text-align: center; cursor: pointer;" onclick="focusHiddenInput()">Код отправлен на <span id="phone-display"></span></p>
+                    <p id="error-msg" class="error-msg">Неверный код</p>
                 </div>
-
-                <button class="btn btn-primary" onclick="handleLogin()">
-                    Продолжить
-                </button>
             </div>
         </div>
 
-        <!-- SCREEN 3: REGISTER -->
-        <div id="screen-register" class="screen">
-            <div class="status-bar">
-                <span>9:41</span>
-                <div style="display:flex; gap:5px;"><svg width="18" height="12" viewBox="0 0 18 12" fill="white"><path d="M1 9.5C1.5 9 3 8 5 8C7 8 8.5 9 9 9.5M3 11.5C3.2 11.3 4 10.5 5 10.5C6 10.5 6.8 11.3 7 11.5M0 7C0.8 6.2 2.5 5 5 5C7.5 5 9.2 6.2 10 7M12 0H18V12H12V0Z"/></svg></div>
-            </div>
+        <!-- Screen 3: Registration (New User) -->
+        <div id="screen-register" class="screen auth-screen">
+            <button class="back-btn" onclick="showScreen('screen-auth')">&nbsp;</button>
+            
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 30px;">Регистрация</h2>
 
-            <div class="nav-header">
-                <button class="back-btn" onclick="showScreen('screen-welcome')">‹</button>
-                <div class="header-title-center">Регистрация</div>
-            </div>
-
-            <div class="form-card" style="margin-top: 40px;">
+            <div class="reg-form">
                 <div class="input-group">
                     <label class="input-label">Ваше имя</label>
-                    <input type="text" class="input-field" placeholder="Иван Иванов" id="reg-name">
+                    <input type="text" class="input-field" id="reg-name" placeholder="Иван Иванов">
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">Номер телефона</label>
-                    <input type="tel" class="input-field" placeholder="+7 (___) ___-__-__" id="reg-phone">
+                    <label class="input-label">Телефон</label>
+                    <input type="text" class="input-field" id="reg-phone-display" disabled style="opacity: 0.5; background: #111;">
                 </div>
 
-                <label class="checkbox-item">
+                <label class="checkbox-row">
                     <input type="checkbox" id="terms">
-                    <span class="checkmark-box">
-                        <svg class="checkmark-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span class="checkbox-box">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" style="display:none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </span>
-                    <span class="checkbox-label">
-                        Я принимаю <a href="#">условия оферты</a> и <a href="#">политику конфиденциальности</a>
-                    </span>
+                    <span class="checkbox-text">Я принимаю условия оферты и политики конфиденциальности</span>
                 </label>
 
-                <button class="btn btn-primary" onclick="handleRegister()">
-                    Создать аккаунт
+                <button class="btn-main" id="btn-reg" onclick="registerUser()">
+                    <span class="btn-text">Создать профиль</span>
+                    <div class="loader"></div>
                 </button>
             </div>
         </div>
@@ -509,51 +443,189 @@
     </div>
 
     <script>
-        // Set current time
-        document.getElementById('time').innerText = new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+        // === CONFIG ===
+        // Вставьте свои ключи Supabase
+        const SUPABASE_URL = "https://ncdwlmgwljjwpuawlssr.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jZHdsbWd3bGpqd3B1YXdsc3NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NTQxNDksImV4cCI6MjA4MzAzMDE0OX0.rrIznUflWydylTnUZvOxOkeF9eMp91qNN4Bjq2gXRL8";
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const TEST_PIN = '1234';
 
+        // === STATE ===
+        let currentPhone = '';
+        let isNewUser = false;
+
+        // === NAVIGATION ===
         function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
-        }
-
-        function handleLogin() {
-            const phone = document.getElementById('login-phone').value;
-            const code = document.getElementById('login-code').value;
             
-            if(!phone) { alert("Введите номер"); return; }
-            if(!code) {
-                // UI Feedback instead of simple alert
-                document.getElementById('login-code').parentElement.style.background = 'rgba(0, 230, 118, 0.1)';
-                document.getElementById('login-code').focus();
-                // Animation
-                const btn = document.querySelector('#screen-login .btn-primary');
-                btn.innerText = "Код отправлен ✓";
-                btn.style.background = '#2C2C2E';
-                btn.style.color = '#00E676';
-                setTimeout(() => {
-                    btn.innerText = "Продолжить";
-                    btn.style.background = '';
-                    btn.style.color = '';
-                }, 2000);
-            } else {
-                alert("Успешный вход! (Тест)");
+            if (screenId === 'screen-auth') {
+                // Reset Auth Flow
+                showStep('step-phone');
+                document.getElementById('phone-input').value = '';
+                document.getElementById('pin-input').value = '';
+                updatePinDots('');
             }
         }
 
-        function handleRegister() {
-            const name = document.getElementById('reg-name').value;
-            const phone = document.getElementById('reg-phone').value;
-            const terms = document.getElementById('terms').checked;
-
-            if(!name || !phone) { alert("Заполните поля"); return; }
-            if(!terms) { alert("Примите условия"); return; }
-
-            alert("Регистрация успешна! (Тест)");
-            showScreen('screen-welcome');
+        function goBack() {
+            // Logic to go back from PIN to Phone
+            if (document.getElementById('step-pin').classList.contains('active')) {
+                showStep('step-phone');
+            } else {
+                showScreen('screen-welcome');
+            }
         }
+
+        function showStep(stepId) {
+            const container = document.querySelector('.step-container');
+            const phoneStep = document.getElementById('step-phone');
+            const pinStep = document.getElementById('step-pin');
+
+            if (stepId === 'step-pin') {
+                phoneStep.classList.remove('active');
+                phoneStep.classList.add('hidden-left');
+                pinStep.classList.add('active');
+                document.getElementById('pin-input').focus();
+            } else {
+                pinStep.classList.remove('active');
+                phoneStep.classList.remove('hidden-left');
+                phoneStep.classList.add('active');
+                document.getElementById('phone-input').focus();
+            }
+        }
+
+        // === PHONE MASKING ===
+        const phoneInput = document.getElementById('phone-input');
+        
+        // Set cursor to end
+        phoneInput.addEventListener('focus', function() {
+            setTimeout(() => {
+                if (this.value.length < 4) this.value = '+7 (';
+                this.selectionStart = this.selectionEnd = this.value.length;
+            }, 0);
+        });
+
+        phoneInput.addEventListener('input', function(e) {
+            let input = e.target.value.replace(/\D/g, ''); // Remove non-digits
+            
+            // Keep only 10 digits after 7 (total 11 with country code)
+            if (input.length > 11) input = input.substring(0, 11);
+            
+            let formatted = '';
+            if (input.length > 0) {
+                // Handle cases where user deletes the +7 part
+                if (!input.startsWith('7') && !input.startsWith('8')) {
+                     formatted = '+7 (' + input.substring(0, 3);
+                } else {
+                    formatted = '+7 (' + input.substring(1, 4);
+                }
+            }
+            if (input.length >= 4) formatted += ') ' + input.substring(4, 7);
+            if (input.length >= 7) formatted += '-' + input.substring(7, 9);
+            if (input.length >= 9) formatted += '-' + input.substring(9, 11);
+            
+            e.target.value = formatted;
+
+            // Transition to PIN if full number
+            if (input.length >= 11 || (input.length >= 10 && !input.startsWith('7'))) {
+                currentPhone = formatted;
+                document.getElementById('phone-display').innerText = formatted;
+                setTimeout(() => showStep('step-pin'), 200);
+            }
+        });
+
+        // === PIN LOGIC ===
+        const pinInput = document.getElementById('pin-input');
+        
+        function focusHiddenInput() {
+            pinInput.focus();
+        }
+
+        pinInput.addEventListener('input', async function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length > 4) val = val.substring(0, 4);
+            e.target.value = val;
+            
+            updatePinDots(val);
+            document.getElementById('error-msg').classList.remove('show');
+
+            if (val.length === 4) {
+                // Check PIN
+                if (val === TEST_PIN) {
+                    await checkUserInDb();
+                } else {
+                    document.getElementById('error-msg').classList.add('show');
+                    // Shake animation logic could go here
+                    e.target.value = '';
+                    updatePinDots('');
+                }
+            }
+        });
+
+        function updatePinDots(val) {
+            const dots = document.querySelectorAll('.pin-dot');
+            dots.forEach((dot, index) => {
+                if (index < val.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+        }
+
+        // === DATABASE LOGIC ===
+        async function checkUserInDb() {
+            // Visual loader maybe? Not implemented for simplicity as it's fast
+            
+            // Query Supabase for phone
+            const { data, error } = await db
+                .from('profiles')
+                .select('*')
+                .eq('phone', currentPhone)
+                .single();
+
+            if (data) {
+                // USER EXISTS
+                alert("Добро пожаловать, " + data.name + "!");
+                // Here you would redirect to the Dashboard
+            } else if (error && error.code === 'PGRST116') {
+                // USER NOT FOUND -> Go to Registration
+                isNewUser = true;
+                document.getElementById('reg-phone-display').value = currentPhone;
+                showScreen('screen-register');
+            } else {
+                alert("Ошибка базы данных: " + error.message);
+            }
+        }
+
+        // === REGISTRATION LOGIC ===
+        async function registerUser() {
+            const name = document.getElementById('reg-name').value.trim();
+            const terms = document.getElementById('terms').checked;
+            const btn = document.getElementById('btn-reg');
+
+            if (!name) { alert("Введите имя"); return; }
+            if (!terms) { alert("Примите условия"); return; }
+
+            btn.classList.add('loading');
+
+            const { data, error } = await db
+                .from('profiles')
+                .insert([
+                    { phone: currentPhone, name: name, role: 'passenger' }
+                ]);
+
+            btn.classList.remove('loading');
+
+            if (error) {
+                alert("Ошибка регистрации: " + error.message);
+            } else {
+                alert("Регистрация успешна!");
+                // Redirect to Dashboard
+            }
+        }
+
+        // Initial focus
+        document.getElementById('phone-input').value = '+7 (';
+        
     </script>
 </body>
 </html>
