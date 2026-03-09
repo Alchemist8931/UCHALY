@@ -26,6 +26,7 @@
             --accent: #00E676;
             --accent-hover: #00C853;
             --accent-dim: rgba(0, 230, 118, 0.15);
+            --danger: #ef4444;
             --radius-base: 14px;
             --radius-lg: 20px;
         }
@@ -76,33 +77,18 @@
         
         .auth-card-header { padding: 20px 20px 0; position: relative; }
 
-        /* Tabs: Login / Register */
         .tab-container { position: relative; display: flex; padding: 3px; background-color: var(--bg-primary); border-radius: 14px; border: 1px solid var(--border-color); }
-        
-        /* FIX: Indicator width adjusted to respect right margin */
         .tab-container .indicator { width: calc(50% - 3px); height: 40px; background: var(--bg-elevated); position: absolute; top: 3px; left: 3px; z-index: 9; border-radius: 11px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .tab-container .tab { width: 50%; height: 40px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
         .tab-container .tab_label { width: 50%; height: 40px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
         .tab-container .tab:checked + .tab_label { color: var(--text-primary); }
-        .tab-container .tab--register:checked ~ .indicator { left: 50%; } /* No need for calc here if width is adjusted, but let's keep it simple. Actually, since width is smaller, left 50% aligns start of indicator to middle. */
+        .tab-container .tab--register:checked ~ .indicator { left: 50%; }
         
-        /* Adjusting Register Indicator Position: 
-           Left is 3px. Width is calc(50% - 3px).
-           When checked, it should move to start at 50% + small offset? No, we want it to align right.
-           Let's stick to width: 50% but use a container padding fix or just standard right alignment.
-           Simplest fix: width calc(50% - 3px); left: 50% means it goes from 50% to 100%-3px. 
-           Wait, Left 50% + Width 50% = 100%. 
-           If width is calc(50% - 3px), then Right edge is 50% + 50% - 3px = 100% - 3px. 
-           This matches the 3px padding on the right. Perfect.
-        */
-
-        /* Sub-Tabs: Passenger / Driver */
-        /* FIX: Width adjusted to match active tab, alignment fixed */
         .sub-tab-container { 
             position: absolute; 
             top: calc(100% + 12px); 
-            right: 23px; /* 20px card padding + 3px tab container padding */
-            width: calc(50% - 3px); /* Matches the active tab width */
+            right: 23px; 
+            width: calc(50% - 3px); 
             display: flex; 
             padding: 2px; 
             background-color: var(--bg-primary); 
@@ -115,8 +101,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
         .auth-card.is-register .sub-tab-container { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        
-        /* FIX: Sub-indicator width */
         .sub-tab-container .indicator-sub { width: calc(50% - 2px); height: 28px; background: var(--bg-elevated); position: absolute; top: 2px; left: 2px; z-index: 9; border-radius: 8px; transition: all 0.3s ease; }
         .sub-tab-container .sub-tab { width: 50%; height: 28px; position: absolute; z-index: 99; opacity: 0; cursor: pointer; }
         .sub-tab-container .sub-tab_label { width: 50%; height: 28px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
@@ -124,11 +108,8 @@
         .sub-tab-container .sub-tab--driver:checked ~ .indicator-sub { left: 50%; }
 
         .auth-card-body { padding: 20px; padding-top: 24px; min-height: 180px; position: relative; }
-        
-        /* FIX: Padding increase when sub-menu appears */
         .auth-card.is-register .auth-card-body { padding-top: 66px; } 
 
-        /* Forms Wrapper Logic */
         .forms-wrapper { position: relative; width: 100%; overflow: hidden; }
         
         .auth-form { display: flex; flex-direction: column; gap: 14px; width: 100%; transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease; }
@@ -139,13 +120,7 @@
         .auth-card.is-register .login-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(-30px); z-index: 1; pointer-events: none; }
         .auth-card.is-register .register-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; pointer-events: auto; }
 
-        /* Scrollable Area for Driver */
-        .form-scroll-area {
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 4px; 
-        }
-        /* Webkit Scrollbar */
+        .form-scroll-area { max-height: 300px; overflow-y: auto; padding-right: 4px; }
         .form-scroll-area::-webkit-scrollbar { width: 4px; }
         .form-scroll-area::-webkit-scrollbar-track { background: var(--bg-primary); }
         .form-scroll-area::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 2px; }
@@ -157,24 +132,15 @@
         .input-label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; font-family: inherit; color: var(--text-muted); pointer-events: none; transition: all 0.3s ease; background: transparent; padding: 0 6px; }
         .styled_input_bar:focus + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: 0; left: 12px; font-size: 12px; font-weight: 500; background-color: var(--bg-card); color: var(--accent); }
 
-        /* File Upload Styling */
         .file-upload-area {
-            border: 1px dashed var(--border-color);
-            border-radius: var(--radius-base);
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 14px;
-            position: relative;
-            overflow: hidden;
+            border: 1px dashed var(--border-color); border-radius: var(--radius-base); padding: 12px;
+            text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 14px;
+            position: relative; overflow: hidden;
         }
         .file-upload-area:hover { border-color: var(--accent); background: rgba(0, 230, 118, 0.05); }
         .file-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
         .file-upload-text { font-size: 13px; color: var(--text-secondary); }
         .file-upload-icon { font-size: 18px; margin-bottom: 4px; display: block; }
-        
-        /* Upload Status Indicator */
         .upload-status { font-size: 11px; color: var(--accent); margin-top: 4px; display: none; }
         .file-upload-area.uploaded { border-style: solid; border-color: var(--accent); }
         .file-upload-area.uploaded .upload-status { display: block; }
@@ -187,7 +153,7 @@
         .submit-btn.loading .loader { display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
         @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        /* PIN Dots (Login) */
+        /* PIN Dots */
         .pin-dots-container { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
         .pin-dot { flex: 1; height: 50px; background: var(--bg-primary); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
@@ -229,14 +195,11 @@
         }
 
         .page-container {
-            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
-            min-height: calc(100% - 20px); padding: 20px;
+            background: transparent; border-radius: var(--radius-lg);
+            min-height: calc(100% - 20px); padding: 0; /* Removed padding for list cards */
             opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .page-container.visible { opacity: 1; transform: translateY(0); }
-
-        .page-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; color: var(--text-muted); text-align: center; }
-        .page-placeholder svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
 
         .app-menu {
             position: fixed; bottom: 0; left: 0; right: 0; height: 100px;
@@ -255,10 +218,132 @@
         .radio-inputs .radio:hover .name { background-color: var(--bg-elevated); }
         .menu-label { font-size: 11px; font-weight: 500; letter-spacing: 0.3px; }
 
-        /* Conditional display for driver fields */
         .driver-fields { display: none; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 14px; }
         .driver-fields.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ================= TRIP CARDS & LIST ================= */
+        .trip-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        .trip-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-base);
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .trip-card:active { transform: scale(0.98); }
+
+        .trip-route { display: flex; align-items: center; margin-bottom: 12px; }
+        .trip-point { flex: 1; display: flex; flex-direction: column; }
+        .trip-point-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+        .trip-point-city { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+        .trip-arrow { padding: 0 10px; color: var(--text-muted); }
+
+        .trip-details { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border-color); }
+        .trip-info { display: flex; flex-direction: column; gap: 4px; }
+        .trip-time { font-size: 14px; font-weight: 600; color: var(--accent); }
+        .trip-seats { font-size: 12px; color: var(--text-muted); }
+
+        .trip-price { text-align: right; }
+        .trip-price-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .trip-price-label { font-size: 11px; color: var(--text-muted); }
+
+        .trip-driver-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--bg-elevated);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5; }
+
+        /* ================= FAB (Floating Action Button) ================= */
+        .fab-container {
+            position: fixed;
+            bottom: calc(100px + env(safe-area-inset-bottom) + 20px); /* Above menu */
+            right: 20px;
+            z-index: 60;
+            display: none; /* Hidden by default */
+        }
+        .fab-container.visible { display: block; }
+        
+        .fab-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--accent);
+            border: none;
+            color: #000;
+            font-size: 28px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 230, 118, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .fab-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
+
+        /* ================= MODAL ================= */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: flex-end; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        
+        .modal-content {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            border-radius: 24px 24px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+        .modal-overlay.visible .modal-content { transform: translateY(0); }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title { font-size: 18px; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 4px;
+        }
+
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+        /* Toggle Switch */
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid var(--border-color);
+        }
+        .toggle-label { font-size: 14px; }
+        .switch { position: relative; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--bg-elevated); transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
     </style>
 </head>
@@ -287,7 +372,6 @@
                             <div class="indicator"></div>
                         </div>
                         
-                        <!-- Sub Tabs for Roles -->
                         <div class="sub-tab-container">
                             <input type="radio" name="roleTab" id="rolePassenger" class="sub-tab sub-tab--passenger" checked />
                             <label class="sub-tab_label" for="rolePassenger">Пассажир</label>
@@ -324,13 +408,11 @@
                             <!-- REGISTER FORM -->
                             <form class="auth-form register-form" id="registerForm">
                                 <div class="form-scroll-area">
-                                    <!-- Passenger/Driver Common Fields -->
                                     <div class="input-container"><input type="text" class="styled_input_bar" id="regLastName" placeholder=" "><label class="input-label" for="regLastName">Фамилия</label></div>
                                     <div class="input-container"><input type="text" class="styled_input_bar" id="regFirstName" placeholder=" "><label class="input-label" for="regFirstName">Имя</label></div>
                                     <div class="input-container"><input type="text" class="styled_input_bar" id="regMiddleName" placeholder=" "><label class="input-label" for="regMiddleName">Отчество</label></div>
                                     <div class="input-container"><input type="tel" class="styled_input_bar" id="regPhone" placeholder=" " maxlength="18"><label class="input-label" for="regPhone">Телефон</label></div>
 
-                                    <!-- Driver Specific Fields -->
                                     <div class="driver-fields" id="driverFields">
                                         <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Данные транспортного средства</div>
                                         <div class="input-container"><input type="text" class="styled_input_bar" id="regCarModel" placeholder=" "><label class="input-label" for="regCarModel">Марка автомобиля</label></div>
@@ -386,13 +468,14 @@
 
             <main class="app-body" id="appBody">
                 <div class="page-container visible" id="pageContainer">
-                    <div class="page-placeholder">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 8v4l3 3"/></svg>
-                        <span>Главный экран</span>
-                        <div style="font-size:12px; margin-top:10px; opacity:0.5;">Поиск и предложения поездок</div>
-                    </div>
+                    <!-- Trip List will be injected here -->
                 </div>
             </main>
+
+            <!-- FAB Button (Visible for Drivers) -->
+            <div class="fab-container" id="fabContainer">
+                <button class="fab-btn" id="openCreateTripModal">+</button>
+            </div>
 
             <nav class="app-menu">
                 <div class="radio-inputs">
@@ -421,6 +504,71 @@
             </nav>
         </div>
 
+        <!-- CREATE TRIP MODAL -->
+        <div class="modal-overlay" id="createTripModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">Создать поездку</span>
+                    <button class="modal-close" id="closeCreateTripModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="createTripForm">
+                        <div class="input-container">
+                            <input type="text" class="styled_input_bar" id="tripOrigin" placeholder=" " required>
+                            <label class="input-label">Откуда</label>
+                        </div>
+                        <div class="input-container">
+                            <input type="text" class="styled_input_bar" id="tripDestination" placeholder=" " required>
+                            <label class="input-label">Куда</label>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <div class="input-container" style="flex: 1;">
+                                <input type="date" class="styled_input_bar" id="tripDate" placeholder=" " required>
+                                <label class="input-label">Дата</label>
+                            </div>
+                            <div class="input-container" style="flex: 1;">
+                                <input type="time" class="styled_input_bar" id="tripTime" placeholder=" " required>
+                                <label class="input-label">Время</label>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <div class="input-container" style="flex: 1;">
+                                <input type="number" class="styled_input_bar" id="tripPrice" placeholder=" " min="0" required>
+                                <label class="input-label">Цена (руб)</label>
+                            </div>
+                            <div class="input-container" style="flex: 1;">
+                                <input type="number" class="styled_input_bar" id="tripSeats" placeholder=" " min="1" max="8" value="3" required>
+                                <label class="input-label">Мест</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <div class="toggle-row">
+                                <span class="toggle-label">Животные</span>
+                                <label class="switch"><input type="checkbox" id="tripAnimals"><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span class="toggle-label">Детское кресло</span>
+                                <label class="switch"><input type="checkbox" id="tripChildSeat"><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span class="toggle-label">Курьерская доставка</span>
+                                <label class="switch"><input type="checkbox" id="tripCourier"><span class="slider"></span></label>
+                            </div>
+                            <div class="toggle-row">
+                                <span class="toggle-label">Мгновенное бронирование</span>
+                                <label class="switch"><input type="checkbox" id="tripInstant"><span class="slider"></span></label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn" style="margin-top: 20px;"><span class="btn-text">Опубликовать</span><div class="loader"></div></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -431,300 +579,400 @@
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jZHdsbWd3bGpqd3B1YXdsc3NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NTQxNDksImV4cCI6MjA4MzAzMDE0OX0.rrIznUflWydylTnUZvOxOkeF9eMp91qNN4Bjq2gXRL8";
         
         let db;
-    try {
-        db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } catch(e) {
-        alert("Ошибка инициализации Supabase. Проверьте правильность URL и Key.");
-        console.error(e);
-    }
-
-    const TEST_PIN = '1234';
-    let currentUser = null;
-
-    // ==========================================
-    // DOM ELEMENTS
-    // ==========================================
-    const authCard = document.getElementById('authCard');
-    const authOverlay = document.getElementById('authOverlay');
-    const appContainer = document.getElementById('appContainer');
-    const tabLogin = document.getElementById('tabLogin');
-    const tabRegister = document.getElementById('tabRegister');
-    const rolePassenger = document.getElementById('rolePassenger');
-    const roleDriver = document.getElementById('roleDriver');
-    const driverFields = document.getElementById('driverFields');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const headerNickname = document.getElementById('headerNickname');
-
-    // ==========================================
-    // TAB SWITCHING LOGIC
-    // ==========================================
-    tabLogin.addEventListener('change', () => { if (tabLogin.checked) authCard.classList.remove('is-register'); });
-    tabRegister.addEventListener('change', () => { if (tabRegister.checked) authCard.classList.add('is-register'); });
-    
-    rolePassenger.addEventListener('change', () => { if(rolePassenger.checked) driverFields.classList.remove('active'); });
-    roleDriver.addEventListener('change', () => { if(roleDriver.checked) driverFields.classList.add('active'); });
-
-    // ==========================================
-    // PHONE MASK
-    // ==========================================
-    function formatPhone(val) {
-        let input = val.replace(/\D/g, '');
-        if (input.length > 0) {
-            if (input[0] === '8' || input[0] === '7') input = input.substring(1);
-            let f = '+7';
-            if (input.length > 0) f += ' (' + input.substring(0, 3);
-            if (input.length > 3) f += ') ' + input.substring(3, 6);
-            if (input.length > 6) f += '-' + input.substring(6, 8);
-            if (input.length > 8) f += '-' + input.substring(8, 10);
-            return f;
-        }
-        return '';
-    }
-
-    function setupPhoneInput(id) {
-        const el = document.getElementById(id);
-        el.addEventListener('input', (e) => {
-            e.target.value = formatPhone(e.target.value);
-        });
-    }
-    
-    setupPhoneInput('loginPhone');
-    setupPhoneInput('regPhone');
-
-    // ==========================================
-    // FILE UPLOAD HELPER (WITH ERROR HANDLING)
-    // ==========================================
-    async function uploadFile(fileInputId, bucketName, folderPath) {
-        const fileInput = document.getElementById(fileInputId);
-        const file = fileInput.files[0];
-        if (!file) return null;
-
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${folderPath}/${Date.now()}.${fileExt}`;
-
         try {
-            const { data, error } = await db.storage
-                .from(bucketName)
-                .upload(fileName, file);
+            db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch(e) {
+            alert("Ошибка инициализации Supabase.");
+            console.error(e);
+        }
 
-            if (error) {
-                // Выводим реальную ошибку Supabase
-                console.error('Upload error details:', error);
-                throw new Error(`Ошибка загрузки файла: ${error.message || JSON.stringify(error)}`);
+        const TEST_PIN = '1234';
+        let currentUser = null;
+
+        // ==========================================
+        // DOM ELEMENTS
+        // ==========================================
+        const authCard = document.getElementById('authCard');
+        const authOverlay = document.getElementById('authOverlay');
+        const appContainer = document.getElementById('appContainer');
+        const tabLogin = document.getElementById('tabLogin');
+        const tabRegister = document.getElementById('tabRegister');
+        const rolePassenger = document.getElementById('rolePassenger');
+        const roleDriver = document.getElementById('roleDriver');
+        const driverFields = document.getElementById('driverFields');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const headerNickname = document.getElementById('headerNickname');
+        const fabContainer = document.getElementById('fabContainer');
+        const createTripModal = document.getElementById('createTripModal');
+        const pageContainer = document.getElementById('pageContainer');
+
+        // ==========================================
+        // TAB SWITCHING LOGIC
+        // ==========================================
+        tabLogin.addEventListener('change', () => { if (tabLogin.checked) authCard.classList.remove('is-register'); });
+        tabRegister.addEventListener('change', () => { if (tabRegister.checked) authCard.classList.add('is-register'); });
+        rolePassenger.addEventListener('change', () => { if(rolePassenger.checked) driverFields.classList.remove('active'); });
+        roleDriver.addEventListener('change', () => { if(roleDriver.checked) driverFields.classList.add('active'); });
+
+        // ==========================================
+        // PHONE MASK
+        // ==========================================
+        function formatPhone(val) {
+            let input = val.replace(/\D/g, '');
+            if (input.length > 0) {
+                if (input[0] === '8' || input[0] === '7') input = input.substring(1);
+                let f = '+7';
+                if (input.length > 0) f += ' (' + input.substring(0, 3);
+                if (input.length > 3) f += ') ' + input.substring(3, 6);
+                if (input.length > 6) f += '-' + input.substring(6, 8);
+                if (input.length > 8) f += '-' + input.substring(8, 10);
+                return f;
             }
-
-            const { data: publicUrl } = db.storage
-                .from(bucketName)
-                .getPublicUrl(fileName);
-
-            return publicUrl.publicUrl;
-        } catch (err) {
-            // Пробрасываем ошибку выше, чтобы её увидел пользователь
-            throw err;
+            return '';
         }
-    }
 
-    // ==========================================
-    // LOGIN LOGIC
-    // ==========================================
-    const pinInput = document.getElementById('pinInput');
-    const pinDots = document.querySelectorAll('.pin-dot');
-    const loginStep1 = document.getElementById('loginStep1');
-    const loginStep2 = document.getElementById('loginStep2');
-    
-    document.querySelector('.pin-dots-container').addEventListener('click', () => pinInput.focus());
-
-    document.getElementById('getCodeBtn').addEventListener('click', () => {
-        const phone = document.getElementById('loginPhone').value;
-        if (phone.length === 18) {
-            loginStep1.style.display = 'none';
-            loginStep2.style.display = 'block';
-            pinInput.focus();
-        } else {
-            alert("Введите корректный номер");
+        function setupPhoneInput(id) {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('input', (e) => { e.target.value = formatPhone(e.target.value); });
         }
-    });
-
-    pinInput.addEventListener('input', async (e) => {
-        let val = e.target.value.replace(/\D/g, '');
-        e.target.value = val;
         
-        pinDots.forEach((dot, i) => {
-            if (i < val.length) dot.classList.add('filled');
-            else dot.classList.remove('filled');
-        });
-        document.getElementById('loginError').style.opacity = 0;
+        setupPhoneInput('loginPhone');
+        setupPhoneInput('regPhone');
 
-        if (val.length === 4) {
-            if (val === TEST_PIN) {
-                await checkUserInDb(document.getElementById('loginPhone').value);
+        // ==========================================
+        // FILE UPLOAD HELPER
+        // ==========================================
+        async function uploadFile(fileInputId, bucketName, folderPath) {
+            const fileInput = document.getElementById(fileInputId);
+            const file = fileInput.files[0];
+            if (!file) return null;
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${folderPath}/${Date.now()}.${fileExt}`;
+
+            try {
+                const { data, error } = await db.storage.from(bucketName).upload(fileName, file);
+                if (error) throw error;
+                const { data: publicUrl } = db.storage.from(bucketName).getPublicUrl(fileName);
+                return publicUrl.publicUrl;
+            } catch (err) {
+                console.error(err);
+                throw err;
+            }
+        }
+
+        // ==========================================
+        // LOGIN LOGIC
+        // ==========================================
+        const pinInput = document.getElementById('pinInput');
+        const pinDots = document.querySelectorAll('.pin-dot');
+        const loginStep1 = document.getElementById('loginStep1');
+        const loginStep2 = document.getElementById('loginStep2');
+        
+        document.querySelector('.pin-dots-container').addEventListener('click', () => pinInput.focus());
+
+        document.getElementById('getCodeBtn').addEventListener('click', () => {
+            const phone = document.getElementById('loginPhone').value;
+            if (phone.length === 18) {
+                loginStep1.style.display = 'none';
+                loginStep2.style.display = 'block';
+                pinInput.focus();
             } else {
-                document.getElementById('loginError').style.opacity = 1;
+                alert("Введите корректный номер");
+            }
+        });
+
+        pinInput.addEventListener('input', async (e) => {
+            let val = e.target.value.replace(/\D/g, '');
+            e.target.value = val;
+            
+            pinDots.forEach((dot, i) => {
+                if (i < val.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+            document.getElementById('loginError').style.opacity = 0;
+
+            if (val.length === 4) {
+                if (val === TEST_PIN) {
+                    await checkUserInDb(document.getElementById('loginPhone').value);
+                } else {
+                    document.getElementById('loginError').style.opacity = 1;
+                    pinInput.value = '';
+                    pinDots.forEach(d => d.classList.remove('filled'));
+                }
+            }
+        });
+
+        async function checkUserInDb(phone) {
+            try {
+                const { data, error } = await db.from('uchaly_users').select('*').eq('phone', phone).single();
+                if (error && error.code !== 'PGRST116') throw error; 
+                if (data) {
+                    currentUser = data;
+                    showApp();
+                } else {
+                    alert("Пользователь не найден. Пожалуйста, зарегистрируйтесь.");
+                    tabRegister.checked = true;
+                    authCard.classList.add('is-register');
+                    document.getElementById('regPhone').value = phone;
+                }
+            } catch (error) {
+                alert("Ошибка соединения с БД: " + error.message);
+            }
+        }
+
+        // ==========================================
+        // REGISTRATION LOGIC
+        // ==========================================
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('regSubmitBtn');
+            
+            const isDriver = roleDriver.checked;
+            const phone = document.getElementById('regPhone').value;
+            const lastName = document.getElementById('regLastName').value;
+            const firstName = document.getElementById('regFirstName').value;
+            const middleName = document.getElementById('regMiddleName').value;
+
+            if (!phone || !lastName || !firstName) { showError("Заполните обязательные поля"); return; }
+            if (phone.length !== 18) { showError("Некорректный телефон"); return; }
+
+            btn.classList.add('loading');
+
+            let insertData = {
+                phone: phone,
+                last_name: lastName,
+                first_name: firstName,
+                middle_name: middleName,
+                role: isDriver ? 'driver' : 'passenger'
+            };
+
+            try {
+                if (isDriver) {
+                    insertData.car_model = document.getElementById('regCarModel').value;
+                    insertData.car_color = document.getElementById('regCarColor').value;
+                    insertData.car_plate = document.getElementById('regCarPlate').value;
+                    const folder = phone.replace(/\D/g, '');
+                    
+                    const licenseUrl = await uploadFile('regFileLicense', 'uchaly_docs', folder);
+                    if(licenseUrl) insertData.driver_license_url = licenseUrl;
+                    const regUrl = await uploadFile('regFileReg', 'uchaly_docs', folder);
+                    if(regUrl) insertData.car_reg_url = regUrl;
+                    const carUrl = await uploadFile('regFileCar', 'uchaly_docs', folder);
+                    if(carUrl) insertData.car_photo_url = carUrl;
+                }
+
+                const { data, error } = await db.from('uchaly_users').insert([insertData]).select().single();
+                if (error) throw error;
+
+                currentUser = data;
+                alert("Регистрация успешна!");
+                showApp();
+
+            } catch (err) {
+                console.error(err);
+                let msg = "Ошибка регистрации";
+                if(err.message) msg = err.message;
+                if(typeof err === 'object') msg = JSON.stringify(err);
+                if(msg.includes('duplicate key')) msg = "Этот номер телефона уже зарегистрирован.";
+                showError(msg);
+            } finally {
+                btn.classList.remove('loading');
+            }
+        });
+
+        document.querySelectorAll('.file-upload-area input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                if(this.files.length > 0) this.parentElement.classList.add('uploaded');
+            });
+        });
+
+        function showError(msg) {
+            const el = document.getElementById('regError');
+            el.textContent = msg;
+            el.style.opacity = 1;
+        }
+
+        // ==========================================
+        // APP STATE & TRIPS LOGIC
+        // ==========================================
+        function showApp() {
+            authOverlay.classList.remove('visible');
+            setTimeout(() => {
+                appContainer.classList.add('visible');
+                updateUI();
+                loadTrips(); // Load trips on app show
+            }, 400);
+        }
+
+        function hideApp() {
+            appContainer.classList.remove('visible');
+            setTimeout(() => {
+                authOverlay.classList.add('visible');
+                // Reset forms
+                loginForm.reset();
+                registerForm.reset();
+                loginStep1.style.display = 'block';
+                loginStep2.style.display = 'none';
                 pinInput.value = '';
                 pinDots.forEach(d => d.classList.remove('filled'));
-            }
-        }
-    });
-
-    async function checkUserInDb(phone) {
-        try {
-            const { data, error } = await db.from('uchaly_users').select('*').eq('phone', phone).single();
-            
-            if (error && error.code !== 'PGRST116') throw error; // Если ошибка не "не найдено", бросаем исключение
-            
-            if (data) {
-                currentUser = data;
-                showApp();
-            } else {
-                alert("Пользователь не найден. Пожалуйста, зарегистрируйтесь.");
-                tabRegister.checked = true;
-                authCard.classList.add('is-register');
-                document.getElementById('regPhone').value = phone;
-            }
-        } catch (error) {
-            alert("Ошибка соединения с БД: " + error.message);
-        }
-    }
-
-    // ==========================================
-    // REGISTRATION LOGIC
-    // ==========================================
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('regSubmitBtn');
-        
-        const isDriver = roleDriver.checked;
-        const phone = document.getElementById('regPhone').value;
-        const lastName = document.getElementById('regLastName').value;
-        const firstName = document.getElementById('regFirstName').value;
-        const middleName = document.getElementById('regMiddleName').value;
-
-        if (!phone || !lastName || !firstName) {
-            showError("Заполните обязательные поля"); return;
-        }
-        if (phone.length !== 18) {
-            showError("Некорректный телефон"); return;
+                tabLogin.checked = true;
+                authCard.classList.remove('is-register');
+                rolePassenger.checked = true;
+                driverFields.classList.remove('active');
+                document.querySelectorAll('.file-upload-area').forEach(el => el.classList.remove('uploaded'));
+            }, 400);
         }
 
-        btn.classList.add('loading');
-
-        let insertData = {
-            phone: phone,
-            last_name: lastName,
-            first_name: firstName,
-            middle_name: middleName,
-            role: isDriver ? 'driver' : 'passenger'
-        };
-
-        try {
-            // If Driver, handle files and extra fields
-            if (isDriver) {
-                insertData.car_model = document.getElementById('regCarModel').value;
-                insertData.car_color = document.getElementById('regCarColor').value;
-                insertData.car_plate = document.getElementById('regCarPlate').value;
-
-                const folder = phone.replace(/\D/g, '');
+        function updateUI() {
+            if (currentUser) {
+                const name = currentUser.first_name || 'User';
+                headerNickname.textContent = name;
+                document.getElementById('pageTitle').textContent = "Добро пожаловать, " + name;
                 
-                // Загрузка файлов с обработкой ошибок
-                const licenseUrl = await uploadFile('regFileLicense', 'uchaly_docs', folder);
-                if(licenseUrl) insertData.driver_license_url = licenseUrl;
-                else console.warn("Файл прав не загружен");
-
-                const regUrl = await uploadFile('regFileReg', 'uchaly_docs', folder);
-                if(regUrl) insertData.car_reg_url = regUrl;
-                else console.warn("Файл СТС не загружен");
-
-                const carUrl = await uploadFile('regFileCar', 'uchaly_docs', folder);
-                if(carUrl) insertData.car_photo_url = carUrl;
-                else console.warn("Фото авто не загружено");
+                // Show FAB if user is a driver
+                if (currentUser.role === 'driver') {
+                    fabContainer.classList.add('visible');
+                } else {
+                    fabContainer.classList.remove('visible');
+                }
             }
-
-            const { data, error } = await db.from('uchaly_users').insert([insertData]).select().single();
-
-            if (error) throw error;
-
-            currentUser = data;
-            alert("Регистрация успешна!");
-            showApp();
-
-        } catch (err) {
-            console.error(err);
-            // Показываем пользователю реальную ошибку
-            let msg = "Ошибка регистрации";
-            if(err.message) msg = err.message;
-            if(typeof err === 'object') msg = JSON.stringify(err);
-            
-            // Более понятные сообщения
-            if(msg.includes('Failed to fetch') || msg.includes('Load failed')) {
-                msg = "Ошибка сети. Проверьте интернет или доступность Supabase URL.";
-            }
-            if(msg.includes('storage')) {
-                msg = "Ошибка загрузки файлов. Проверьте создание бакета 'uchaly_docs' в SQL.";
-            }
-            if(msg.includes('duplicate key')) {
-                msg = "Этот номер телефона уже зарегистрирован.";
-            }
-            
-            showError(msg);
-        } finally {
-            btn.classList.remove('loading');
         }
-    });
 
-    // Visual feedback for file inputs
-    document.querySelectorAll('.file-upload-area input[type="file"]').forEach(input => {
-        input.addEventListener('change', function() {
-            if(this.files.length > 0) {
-                this.parentElement.classList.add('uploaded');
+        document.getElementById('logoutBtn').addEventListener('click', hideApp);
+
+        // --- Modal Controls ---
+        document.getElementById('openCreateTripModal').addEventListener('click', () => {
+            createTripModal.classList.add('visible');
+        });
+
+        document.getElementById('closeCreateTripModal').addEventListener('click', () => {
+            createTripModal.classList.remove('visible');
+        });
+
+        createTripModal.addEventListener('click', (e) => {
+            if (e.target === createTripModal) createTripModal.classList.remove('visible');
+        });
+
+        // --- Create Trip Logic ---
+        document.getElementById('createTripForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('.submit-btn');
+            btn.classList.add('loading');
+
+            const dateVal = document.getElementById('tripDate').value;
+            const timeVal = document.getElementById('tripTime').value;
+            
+            // Construct ISO timestamp (assuming local time for simplicity, adjust as needed)
+            // Note: Supabase expects ISO string usually.
+            const departureTimestamp = new Date(`${dateVal}T${timeVal}`).toISOString();
+
+            const tripData = {
+                driver_id: currentUser.id,
+                origin_city: document.getElementById('tripOrigin').value,
+                destination_city: document.getElementById('tripDestination').value,
+                departure_time: departureTimestamp,
+                price: parseInt(document.getElementById('tripPrice').value),
+                total_seats: parseInt(document.getElementById('tripSeats').value),
+                available_seats: parseInt(document.getElementById('tripSeats').value),
+                allows_animals: document.getElementById('tripAnimals').checked,
+                has_child_seat: document.getElementById('tripChildSeat').checked,
+                accepts_courier: document.getElementById('tripCourier').checked,
+                is_instant_booking: document.getElementById('tripInstant').checked,
+                status: 'active'
+            };
+
+            try {
+                const { error } = await db.from('uchaly_trips').insert([tripData]);
+                if (error) throw error;
+                
+                createTripModal.classList.remove('visible');
+                document.getElementById('createTripForm').reset();
+                loadTrips(); // Refresh list
+            } catch (err) {
+                alert("Ошибка создания поездки: " + err.message);
+            } finally {
+                btn.classList.remove('loading');
             }
         });
-    });
 
-    function showError(msg) {
-        const el = document.getElementById('regError');
-        el.textContent = msg;
-        el.style.opacity = 1;
-    }
-
-    // ==========================================
-    // APP STATE
-    // ==========================================
-    function showApp() {
-        authOverlay.classList.remove('visible');
-        setTimeout(() => {
-            appContainer.classList.add('visible');
-            updateUI();
-        }, 400);
-    }
-
-    function hideApp() {
-        appContainer.classList.remove('visible');
-        setTimeout(() => {
-            authOverlay.classList.add('visible');
-            loginForm.reset();
-            registerForm.reset();
-            loginStep1.style.display = 'block';
-            loginStep2.style.display = 'none';
-            pinInput.value = '';
-            pinDots.forEach(d => d.classList.remove('filled'));
-            tabLogin.checked = true;
-            authCard.classList.remove('is-register');
-            rolePassenger.checked = true;
-            driverFields.classList.remove('active');
+        // --- Load & Render Trips ---
+        async function loadTrips() {
+            // Fetch active trips
+            // We also need driver info, Supabase allows joins if foreign key is set
+            // But since RLS is off and simple select is used, let's fetch with join if possible or manually match.
+            // To keep it simple for now without complex joins setup in SQL (though we added FK):
             
-            document.querySelectorAll('.file-upload-area').forEach(el => el.classList.remove('uploaded'));
-        }, 400);
-    }
+            let { data: trips, error } = await db
+                .from('uchaly_trips')
+                .select('*, driver:uchaly_users(first_name, car_model, car_color)') // This works if FK name matches
+                .eq('status', 'active')
+                .order('departure_time', { ascending: true });
 
-    function updateUI() {
-        if (currentUser) {
-            const name = currentUser.first_name || 'User';
-            headerNickname.textContent = name;
-            document.getElementById('pageTitle').textContent = "Добро пожаловать, " + name;
+            if (error) {
+                console.error("Load error", error);
+                // Fallback if join fails due to naming, just fetch trips
+                let res = await db.from('uchaly_trips').select('*').eq('status', 'active');
+                trips = res.data;
+            }
+
+            renderTrips(trips || []);
         }
-    }
 
-    document.getElementById('logoutBtn').addEventListener('click', hideApp);
+        function renderTrips(trips) {
+            if (!trips || trips.length === 0) {
+                pageContainer.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 8v4l3 3"/></svg>
+                        <div>Активных поездок пока нет</div>
+                    </div>`;
+                return;
+            }
 
-</script>
+            let html = '<div class="trip-list">';
+            trips.forEach(trip => {
+                const date = new Date(trip.departure_time);
+                const timeStr = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+                
+                // Driver info handling (depending on if join worked)
+                // If join worked: trip.driver is object. If not, we need to fetch user separately (skipped for simplicity).
+                // Let's assume trip.driver might be null or object.
+                const driverName = trip.driver ? trip.driver.first_name : (currentUser && trip.driver_id === currentUser.id ? currentUser.first_name : 'Водитель');
+                const carInfo = trip.driver && trip.driver.car_model ? `${trip.driver.car_model} ${trip.driver.car_color}` : '';
+
+                html += `
+                    <div class="trip-card">
+                        <div class="trip-driver-badge">${driverName}</div>
+                        <div class="trip-route">
+                            <div class="trip-point">
+                                <span class="trip-point-label">Откуда</span>
+                                <span class="trip-point-city">${trip.origin_city}</span>
+                            </div>
+                            <div class="trip-arrow">→</div>
+                            <div class="trip-point">
+                                <span class="trip-point-label">Куда</span>
+                                <span class="trip-point-city">${trip.destination_city}</span>
+                            </div>
+                        </div>
+                        <div class="trip-details">
+                            <div class="trip-info">
+                                <span class="trip-time">${dateStr}, ${timeStr}</span>
+                                <span class="trip-seats">${trip.available_seats} из ${trip.total_seats} мест • ${carInfo}</span>
+                            </div>
+                            <div class="trip-price">
+                                <span class="trip-price-value">${trip.price} ₽</span>
+                                <span class="trip-price-label">за место</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            pageContainer.innerHTML = html;
+        }
+
+    </script>
+</body>
+</html>
