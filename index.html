@@ -489,7 +489,7 @@
         });
 
         async function checkUserInDb(phone) {
-            const { data, error } = await db.from('profiles').select('*').eq('phone', phone).single();
+            const { data, error } = await db.from('uchaly_users').select('*').eq('phone', phone).single();
             
             if (data) {
                 currentUser = data;
@@ -546,7 +546,7 @@
                 // For now, we just register the user. 
             }
 
-            const { data, error } = await db.from('profiles').insert([insertData]).select().single();
+            const { data, error } = await db.from('uchaly_users').insert([insertData]).select().single();
 
             btn.classList.remove('loading');
 
