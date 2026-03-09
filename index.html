@@ -2,630 +2,610 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Едем Учалы</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- Подключаем Supabase -->
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#050505">
+    
+    <title>Едем Учалы</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         :root {
-            --bg-deep: #050505;
-            --bg-surface: #0F0F0F;
-            --primary: #00E676;
-            --primary-dim: rgba(0, 230, 118, 0.15);
-            --text-main: #FFFFFF;
-            --text-secondary: #6e6e73;
+            --bg-primary: #050505;
+            --bg-secondary: #121212;
+            --bg-card: #1E1E1E;
+            --bg-elevated: #2C2C2C;
+            --text-primary: #FFFFFF;
+            --text-secondary: #888888;
+            --text-muted: #555555;
             --border-color: rgba(255, 255, 255, 0.1);
+            --accent: #00E676;
+            --accent-hover: #00C853;
+            --accent-dim: rgba(0, 230, 118, 0.15);
             --radius-base: 14px;
-            --font-main: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            --radius-lg: 20px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: var(--font-main);
-            background-color: var(--bg-deep);
-            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
-            align-items: center;
-            overflow: hidden;
         }
 
         #app {
             width: 100%;
             max-width: 420px;
             height: 100%;
-            display: flex;
-            flex-direction: column;
             position: relative;
             overflow: hidden;
-            background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #050505 70%);
-        }
-
-        /* --- Ambient Background --- */
-        .bg-glow {
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: var(--primary);
-            filter: blur(120px);
-            opacity: 0.03;
-            border-radius: 50%;
-            z-index: 0;
-            pointer-events: none;
-        }
-        .bg-glow.active { top: -150px; left: -100px; }
-
-        /* --- Screen Logic --- */
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
-            z-index: 1;
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.95);
-            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
-        .screen.active {
-            opacity: 1;
-            pointer-events: all;
-            transform: scale(1);
-            z-index: 10;
+        /* ================= AUTH SECTION ================= */
+        .auth-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+            background: var(--bg-primary);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity 0.4s ease, visibility 0s linear 0.4s;
         }
+        .auth-overlay.visible { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.4s ease, visibility 0s linear 0s; }
 
-        /* --- Welcome Screen --- */
-        .welcome-screen {
-            justify-content: space-between;
-            padding: 60px 24px 40px;
+        .auth-container { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; position: relative; }
+
+        .auth-brand { margin-bottom: 32px; text-align: center; }
+        .brand-icon { width: 64px; height: 64px; background: var(--accent-dim); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid rgba(0, 230, 118, 0.2); }
+        .brand-icon svg { width: 32px; height: 32px; fill: var(--accent); }
+        .brand-title { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .brand-subtitle { font-size: 14px; color: var(--text-muted); }
+
+        .auth-card { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: scale(0.98) translateY(10px); }
+        .auth-overlay.visible .auth-card { transform: scale(1) translateY(0); }
+        
+        .auth-card-header { padding: 20px 20px 0; position: relative; }
+
+        /* Tabs: Login / Register */
+        .tab-container { position: relative; display: flex; padding: 3px; background-color: var(--bg-primary); border-radius: 14px; border: 1px solid var(--border-color); }
+        .tab-container .indicator { width: 50%; height: 40px; background: var(--bg-elevated); position: absolute; top: 3px; left: 3px; z-index: 9; border-radius: 11px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tab-container .tab { width: 50%; height: 40px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
+        .tab-container .tab_label { width: 50%; height: 40px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
+        .tab-container .tab:checked + .tab_label { color: var(--text-primary); }
+        .tab-container .tab--register:checked ~ .indicator { left: 50%; }
+
+        /* Sub-Tabs: Passenger / Driver */
+        .sub-tab-container { position: absolute; top: calc(100% + 12px); right: 20px; width: 200px; display: flex; padding: 2px; background-color: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color); z-index: 10; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .auth-card.is-register .sub-tab-container { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .sub-tab-container .indicator-sub { width: 50%; height: 28px; background: var(--bg-elevated); position: absolute; top: 2px; left: 2px; z-index: 9; border-radius: 8px; transition: all 0.3s ease; }
+        .sub-tab-container .sub-tab { width: 50%; height: 28px; position: absolute; z-index: 99; opacity: 0; cursor: pointer; }
+        .sub-tab-container .sub-tab_label { width: 50%; height: 28px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
+        .sub-tab-container .sub-tab:checked + .sub-tab_label { color: var(--accent); }
+        .sub-tab-container .sub-tab--driver:checked ~ .indicator-sub { left: 50%; }
+
+        .auth-card-body { padding: 20px; padding-top: 24px; min-height: 180px; position: relative; }
+        
+        /* Forms Wrapper Logic */
+        .forms-wrapper { position: relative; width: 100%; overflow: hidden; }
+        
+        .auth-form { display: flex; flex-direction: column; gap: 14px; width: 100%; transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease; }
+
+        .login-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; }
+        .register-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(30px); z-index: 1; pointer-events: none; max-height: 400px; } /* Limit height for scroll */
+
+        .auth-card.is-register .login-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(-30px); z-index: 1; pointer-events: none; }
+        .auth-card.is-register .register-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; pointer-events: auto; }
+
+        /* Scrollable Area for Driver */
+        .form-scroll-area {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 4px; /* Scrollbar space */
+        }
+        /* Webkit Scrollbar */
+        .form-scroll-area::-webkit-scrollbar { width: 4px; }
+        .form-scroll-area::-webkit-scrollbar-track { background: var(--bg-primary); }
+        .form-scroll-area::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 2px; }
+
+        .input-container { position: relative; width: 100%; margin-bottom: 14px; }
+        .styled_input_bar { width: 100%; padding: 16px 16px; font-size: 15px; font-family: inherit; border: 1.5px solid var(--border-color); border-radius: var(--radius-base); background-color: var(--bg-secondary); color: var(--text-primary); outline: none; transition: all 0.3s ease; }
+        .styled_input_bar::placeholder { color: transparent; }
+        .styled_input_bar:focus { border-color: var(--accent); background-color: var(--bg-card); box-shadow: 0 0 0 3px var(--accent-dim); }
+        .input-label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; font-family: inherit; color: var(--text-muted); pointer-events: none; transition: all 0.3s ease; background: transparent; padding: 0 6px; }
+        .styled_input_bar:focus + .input-label, .styled_input_bar:not(:placeholder-shown) + .input-label { top: 0; left: 12px; font-size: 12px; font-weight: 500; background-color: var(--bg-card); color: var(--accent); }
+
+        /* File Upload Styling */
+        .file-upload-area {
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-base);
+            padding: 12px;
             text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+        .file-upload-area:hover { border-color: var(--accent); background: rgba(0, 230, 118, 0.05); }
+        .file-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .file-upload-text { font-size: 13px; color: var(--text-secondary); }
+        .file-upload-icon { font-size: 18px; margin-bottom: 4px; display: block; }
+
+        .submit-btn { width: 100%; padding: 16px 24px; background: var(--accent); color: #000; border: none; border-radius: var(--radius-base); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; margin-top: 8px; }
+        .submit-btn:hover { background: var(--accent-hover); }
+        .submit-btn:disabled { background: var(--bg-elevated); color: var(--text-muted); cursor: not-allowed; }
+        .submit-btn .loader { display: none; width: 20px; height: 20px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .submit-btn.loading .btn-text { visibility: hidden; }
+        .submit-btn.loading .loader { display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* PIN Dots (Login) */
+        .pin-dots-container { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+        .pin-dot { flex: 1; height: 50px; background: var(--bg-primary); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+        .pin-dot.filled::after { content: ''; width: 12px; height: 12px; background: #000; border-radius: 50%; }
+        .hidden-pin-input { position: absolute; opacity: 0; pointer-events: none; }
+
+        /* ================= APP SHELL ================= */
+        .app-container { display: none; min-height: 100vh; min-height: 100dvh; flex-direction: column; }
+        .app-container.visible { display: flex; }
+
+        .app-header {
+            position: fixed; top: 0; left: 0; right: 0; height: auto; min-height: 60px;
+            padding-top: env(safe-area-inset-top); background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color); z-index: 50;
+            display: flex; align-items: center; justify-content: space-between;
+            padding-left: 20px; padding-right: 20px; padding-bottom: 10px;
         }
 
-        .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--primary-dim);
-            border-radius: 16px;
-            margin: 0 auto 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(0, 230, 118, 0.2);
+        .header-left { display: flex; flex-direction: column; gap: 4px; }
+        .header-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+        .header-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .header-nickname { font-size: 14px; font-weight: 500; color: #000; padding: 8px 14px; background: var(--accent); border-radius: 10px; }
+
+        .logout-btn {
+            width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border-color);
+            background: var(--bg-card); color: var(--text-secondary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
         }
+        .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
 
-        .logo-icon svg { width: 32px; height: 32px; fill: var(--primary); }
-
-        .welcome-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #999999 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .welcome-subtitle {
-            font-size: 16px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        /* --- Vehicle --- */
-        .vehicle-container {
+        .app-body {
             flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .car-svg {
-            width: 100%;
-            max-width: 300px;
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
-            animation: floatCar 4s ease-in-out infinite;
-        }
-        
-        @keyframes floatCar {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            margin-top: calc(50px + env(safe-area-inset-top) + 10px);
+            margin-bottom: calc(100px + env(safe-area-inset-bottom));
+            padding: 10px 20px;
+            overflow-y: auto; position: relative; z-index: 10;
         }
 
-        /* --- Buttons --- */
-        .btn-main {
-            width: 100%;
-            padding: 18px;
-            border-radius: var(--radius-base);
-            border: none;
-            background: var(--primary);
-            color: #000;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-            position: relative;
-            overflow: hidden;
+        .page-container {
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+            min-height: calc(100% - 20px); padding: 20px;
+            opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .page-container.visible { opacity: 1; transform: translateY(0); }
+
+        .page-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; color: var(--text-muted); text-align: center; }
+        .page-placeholder svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
+
+        .app-menu {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 100px;
+            background: var(--bg-primary); border-top: 1px solid var(--border-color); z-index: 50;
+            display: flex; align-items: center; justify-content: center; padding: 10px;
+            padding-bottom: calc(-10px + env(safe-area-inset-bottom));
         }
 
-        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
-        
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            margin-top: 12px;
-        }
+        .radio-inputs { position: relative; display: flex; flex-wrap: wrap; border-radius: 16px; background-color: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); padding: 4px; width: 100%; font-size: 14px; }
+        .radio-inputs .radio { flex: 1 1 auto; text-align: center; }
+        .radio-inputs .radio input { display: none; }
+        .radio-inputs .radio .name { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border-radius: 12px; border: none; padding: 16px 8px; color: var(--text-muted); transition: all 0.2s ease-in-out; }
+        .radio-inputs .radio .name svg { width: 24px; height: 24px; opacity: 0.6; transition: all 0.2s ease; }
+        .radio-inputs .radio input:checked + .name { background-color: var(--bg-elevated); color: var(--accent); font-weight: 600; }
+        .radio-inputs .radio input:checked + .name svg { opacity: 1; }
+        .radio-inputs .radio:hover .name { background-color: var(--bg-elevated); }
+        .menu-label { font-size: 11px; font-weight: 500; letter-spacing: 0.3px; }
 
-        /* --- Auth Screen --- */
-        .auth-screen {
-            justify-content: flex-start;
-            padding: 60px 24px;
-        }
-
-        .back-btn {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-surface);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            margin-bottom: 40px;
-            transition: background 0.2s;
-        }
-        .back-btn:hover { background: #1a1a1a; }
-
-        /* --- Step Container --- */
-        .step-container {
-            position: relative;
-            width: 100%;
-            height: 300px; /* Fixed height for smooth transition */
-        }
-
-        .step {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            opacity: 0;
-            transform: translateX(50px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-        }
-
-        .step.active {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: all;
-        }
-
-        .step.hidden-left {
-            opacity: 0;
-            transform: translateX(-50px);
-        }
-
-        .input-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            display: block;
-            font-weight: 500;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 18px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-base);
-            color: white;
-            font-size: 20px;
-            font-weight: 500;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .input-field:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-dim);
-        }
-
-        /* --- PIN Dots --- */
-        .pin-dots {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            padding: 0 20px;
-            margin-bottom: 40px;
-        }
-
-        .pin-dot {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .pin-dot.filled {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .pin-dot.filled::after {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: #000;
-            border-radius: 50%;
-        }
-
-        .pin-input-hidden {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .error-msg {
-            color: #FF453A;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 20px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        .error-msg.show { opacity: 1; }
-
-        /* --- Registration Form --- */
-        .reg-form { margin-top: 30px; }
-        .reg-form .input-group { margin-bottom: 20px; }
-        
-        /* Checkbox */
-        .checkbox-row {
-            display: flex;
-            align-items: flex-start;
-            cursor: pointer;
-            margin-bottom: 30px;
-        }
-        .checkbox-box {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #333;
-            border-radius: 8px;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .checkbox-row input:checked + .checkbox-box {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-        .checkbox-row input:checked + .checkbox-box svg { display: block; }
-        .checkbox-row input { display: none; }
-        .checkbox-text { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
-        .checkbox-text a { color: var(--primary); text-decoration: none; }
-        
-        /* Loader */
-        .loader {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(0,0,0,0.2);
-            border-top-color: #000;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        .btn-main.loading .loader { display: block; margin: auto; }
-        .btn-main.loading .btn-text { display: none; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* Conditional display for driver fields */
+        .driver-fields { display: none; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 14px; }
+        .driver-fields.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
     </style>
 </head>
 <body>
 
     <div id="app">
-        <div class="bg-glow active"></div>
-
-        <!-- Screen 1: Welcome -->
-        <div id="screen-welcome" class="screen welcome-screen active">
-            <div>
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                </div>
-                <h1 class="welcome-title">Едем Учалы</h1>
-                <p class="welcome-subtitle">Удобный сервис совместных поездок. Экономьте время и деньги, путешествуя вместе.</p>
-            </div>
-
-            <div class="vehicle-container">
-                <svg class="car-svg" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
-                     <defs>
-                        <linearGradient id="carGrad" x1="0%" y1="0%" x2="0%" y2="100%"> <stop offset="0%" style="stop-color:#333" /> <stop offset="100%" style="stop-color:#111" /> </linearGradient>
-                    </defs>
-                    <!-- Car Body -->
-                    <path d="M180 310 L210 210 H460 L520 310 H180 Z" fill="url(#carGrad)"/>
-                    <path d="M240 210 L260 180 H380 L420 210 Z" fill="#222"/>
-                    <!-- Wheels -->
-                    <circle cx="240" cy="320" r="32" fill="#111" stroke="#333" stroke-width="4"/>
-                    <circle cx="240" cy="320" r="16" fill="#222"/>
-                    <circle cx="450" cy="320" r="32" fill="#111" stroke="#333" stroke-width="4"/>
-                    <circle cx="450" cy="320" r="16" fill="#222"/>
-                    <!-- Accents -->
-                    <path d="M520 290 L560 280 L560 300 L520 300 Z" fill="rgba(0,230,118,0.5)"/>
-                    <path d="M185 300 L200 270 H500 L515 300" stroke="#00E676" stroke-width="2" fill="none" opacity="0.7"/>
-                </svg>
-            </div>
-
-            <button class="btn-main" onclick="showScreen('screen-auth')">
-                <span class="btn-text">Начать</span>
-            </button>
-        </div>
-
-        <!-- Screen 2: Auth (Phone + Pin) -->
-        <div id="screen-auth" class="screen auth-screen">
-            <button class="back-btn" onclick="goBack()">‹</button>
-
-            <div class="step-container">
-                <!-- Step 1: Phone -->
-                <div id="step-phone" class="step active">
-                    <label class="input-label">Номер телефона</label>
-                    <input type="tel" class="input-field" id="phone-input" placeholder="+7 (___) ___-__-__" autocomplete="off">
-                    <p style="color: var(--text-secondary); font-size: 12px; margin-top: 12px; text-align: center;">На этот номер будет отправлен код</p>
-                </div>
-
-                <!-- Step 2: PIN -->
-                <div id="step-pin" class="step">
-                    <label class="input-label">Введите код из SMS</label>
-                    <div class="pin-dots" onclick="focusHiddenInput()">
-                        <div class="pin-dot"></div>
-                        <div class="pin-dot"></div>
-                        <div class="pin-dot"></div>
-                        <div class="pin-dot"></div>
+        
+        <!-- AUTH OVERLAY -->
+        <div class="auth-overlay visible" id="authOverlay">
+            <div class="auth-container">
+                <div class="auth-brand">
+                    <div class="brand-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
                     </div>
-                    <input type="tel" class="pin-input-hidden" id="pin-input" maxlength="4">
-                    <p style="color: var(--text-secondary); font-size: 12px; text-align: center; cursor: pointer;" onclick="focusHiddenInput()">Код отправлен на <span id="phone-display"></span></p>
-                    <p id="error-msg" class="error-msg">Неверный код</p>
+                    <div class="brand-title">Едем Учалы</div>
+                    <div class="brand-subtitle">Сервис совместных поездок</div>
+                </div>
+
+                <div class="auth-card" id="authCard">
+                    <div class="auth-card-header">
+                        <div class="tab-container">
+                            <input type="radio" name="authTab" id="tabLogin" class="tab tab--login" checked />
+                            <label class="tab_label" for="tabLogin">Вход</label>
+                            <input type="radio" name="authTab" id="tabRegister" class="tab tab--register" />
+                            <label class="tab_label" for="tabRegister">Регистрация</label>
+                            <div class="indicator"></div>
+                        </div>
+                        
+                        <!-- Sub Tabs for Roles -->
+                        <div class="sub-tab-container">
+                            <input type="radio" name="roleTab" id="rolePassenger" class="sub-tab sub-tab--passenger" checked />
+                            <label class="sub-tab_label" for="rolePassenger">Пассажир</label>
+                            <input type="radio" name="roleTab" id="roleDriver" class="sub-tab sub-tab--driver" />
+                            <label class="sub-tab_label" for="roleDriver">Водитель</label>
+                            <div class="indicator-sub"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="auth-card-body">
+                        <div class="forms-wrapper">
+                            
+                            <!-- LOGIN FORM -->
+                            <form class="auth-form login-form" id="loginForm">
+                                <div id="loginStep1">
+                                    <div class="input-container">
+                                        <input type="tel" class="styled_input_bar" id="loginPhone" placeholder=" " autocomplete="tel">
+                                        <label class="input-label" for="loginPhone">Номер телефона</label>
+                                    </div>
+                                    <button type="button" class="submit-btn" id="getCodeBtn"><span class="btn-text">Получить код</span><div class="loader"></div></button>
+                                </div>
+
+                                <div id="loginStep2" style="display:none;">
+                                    <div style="margin-bottom: 12px; font-size: 13px; color: var(--text-muted); text-align: center;">Код отправлен на номер</div>
+                                    <div class="pin-dots-container" onclick="document.getElementById('pinInput').focus()">
+                                        <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+                                    </div>
+                                    <input type="tel" class="hidden-pin-input" id="pinInput" maxlength="4">
+                                    <p id="loginError" style="color:#ef4444; font-size:12px; text-align:center; margin-top:10px; opacity:0;">Неверный код</p>
+                                    <button type="button" class="submit-btn" id="loginSubmitBtn" style="margin-top:10px;"><span class="btn-text">Войти</span><div class="loader"></div></button>
+                                </div>
+                            </form>
+                            
+                            <!-- REGISTER FORM -->
+                            <form class="auth-form register-form" id="registerForm">
+                                <div class="form-scroll-area">
+                                    <!-- Passenger/Driver Common Fields -->
+                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regLastName" placeholder=" "><label class="input-label" for="regLastName">Фамилия</label></div>
+                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regFirstName" placeholder=" "><label class="input-label" for="regFirstName">Имя</label></div>
+                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regMiddleName" placeholder=" "><label class="input-label" for="regMiddleName">Отчество</label></div>
+                                    <div class="input-container"><input type="tel" class="styled_input_bar" id="regPhone" placeholder=" " maxlength="18"><label class="input-label" for="regPhone">Телефон</label></div>
+
+                                    <!-- Driver Specific Fields -->
+                                    <div class="driver-fields" id="driverFields">
+                                        <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Данные транспортного средства</div>
+                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarModel" placeholder=" "><label class="input-label" for="regCarModel">Марка автомобиля</label></div>
+                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarColor" placeholder=" "><label class="input-label" for="regCarColor">Цвет автомобиля</label></div>
+                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarPlate" placeholder=" "><label class="input-label" for="regCarPlate">Гос номер</label></div>
+                                        
+                                        <div style="font-size:12px; color:var(--text-muted); margin:10px 0;">Загрузка документов</div>
+                                        
+                                        <div class="file-upload-area">
+                                            <input type="file" id="regFileLicense" accept="image/*">
+                                            <span class="file-upload-icon">📷</span>
+                                            <span class="file-upload-text">Фото водительского удостоверения</span>
+                                        </div>
+                                        <div class="file-upload-area">
+                                            <input type="file" id="regFileReg" accept="image/*">
+                                            <span class="file-upload-icon">📄</span>
+                                            <span class="file-upload-text">Фото свид. о регистрации (СТС)</span>
+                                        </div>
+                                        <div class="file-upload-area">
+                                            <input type="file" id="regFileCar" accept="image/*">
+                                            <span class="file-upload-icon">🚗</span>
+                                            <span class="file-upload-text">Фото авто спереди с госномером</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="regError" style="color:#ef4444; font-size:12px; text-align:center; margin-top:10px; opacity:0;"></div>
+
+                                <button type="submit" class="submit-btn" id="regSubmitBtn"><span class="btn-text">Зарегистрироваться</span><div class="loader"></div></button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Screen 3: Registration (New User) -->
-        <div id="screen-register" class="screen auth-screen">
-            <button class="back-btn" onclick="showScreen('screen-auth')">&nbsp;</button>
-            
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 30px;">Регистрация</h2>
-
-            <div class="reg-form">
-                <div class="input-group">
-                    <label class="input-label">Ваше имя</label>
-                    <input type="text" class="input-field" id="reg-name" placeholder="Иван Иванов">
+        <!-- APP SHELL -->
+        <div class="app-container" id="appContainer">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="header-title" id="pageTitle">Едем Учалы</h1>
                 </div>
-
-                <div class="input-group">
-                    <label class="input-label">Телефон</label>
-                    <input type="text" class="input-field" id="reg-phone-display" disabled style="opacity: 0.5; background: #111;">
+                <div class="header-right">
+                    <span class="header-nickname" id="headerNickname">User</span>
+                    <button class="logout-btn" id="logoutBtn" title="Выйти">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    </button>
                 </div>
+            </header>
 
-                <label class="checkbox-row">
-                    <input type="checkbox" id="terms">
-                    <span class="checkbox-box">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" style="display:none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </span>
-                    <span class="checkbox-text">Я принимаю условия оферты и политики конфиденциальности</span>
-                </label>
+            <main class="app-body" id="appBody">
+                <div class="page-container visible" id="pageContainer">
+                    <div class="page-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 8v4l3 3"/></svg>
+                        <span>Главный экран</span>
+                        <div style="font-size:12px; margin-top:10px; opacity:0.5;">Поиск и предложения поездок</div>
+                    </div>
+                </div>
+            </main>
 
-                <button class="btn-main" id="btn-reg" onclick="registerUser()">
-                    <span class="btn-text">Создать профиль</span>
-                    <div class="loader"></div>
-                </button>
-            </div>
+            <nav class="app-menu">
+                <div class="radio-inputs">
+                    <label class="radio">
+                        <input type="radio" name="appMenu" id="menuSearch" checked>
+                        <span class="name">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <span class="menu-label">Поиск</span>
+                        </span>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="appMenu" id="menuTrips">
+                        <span class="name">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span class="menu-label">Мои рейсы</span>
+                        </span>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="appMenu" id="menuProfile">
+                        <span class="name">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <span class="menu-label">Профиль</span>
+                        </span>
+                    </label>
+                </div>
+            </nav>
         </div>
 
     </div>
 
     <script>
-        // === CONFIG ===
-        // Вставьте свои ключи Supabase
-        const SUPABASE_URL = "https://ncdwlmgwljjwpuawlssr.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jZHdsbWd3bGpqd3B1YXdsc3NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NTQxNDksImV4cCI6MjA4MzAzMDE0OX0.rrIznUflWydylTnUZvOxOkeF9eMp91qNN4Bjq2gXRL8";
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        const SUPABASE_URL = 'https://YOUR_PROJECT_URL.supabase.co'; 
+        const SUPABASE_KEY = 'YOUR_ANON_KEY';
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const TEST_PIN = '1234';
+        let currentUser = null;
 
-        // === STATE ===
-        let currentPhone = '';
-        let isNewUser = false;
+        // ==========================================
+        // DOM ELEMENTS
+        // ==========================================
+        const authCard = document.getElementById('authCard');
+        const authOverlay = document.getElementById('authOverlay');
+        const appContainer = document.getElementById('appContainer');
+        const tabLogin = document.getElementById('tabLogin');
+        const tabRegister = document.getElementById('tabRegister');
+        const rolePassenger = document.getElementById('rolePassenger');
+        const roleDriver = document.getElementById('roleDriver');
+        const driverFields = document.getElementById('driverFields');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const headerNickname = document.getElementById('headerNickname');
 
-        // === NAVIGATION ===
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            if (screenId === 'screen-auth') {
-                // Reset Auth Flow
-                showStep('step-phone');
-                document.getElementById('phone-input').value = '';
-                document.getElementById('pin-input').value = '';
-                updatePinDots('');
-            }
-        }
-
-        function goBack() {
-            // Logic to go back from PIN to Phone
-            if (document.getElementById('step-pin').classList.contains('active')) {
-                showStep('step-phone');
-            } else {
-                showScreen('screen-welcome');
-            }
-        }
-
-        function showStep(stepId) {
-            const container = document.querySelector('.step-container');
-            const phoneStep = document.getElementById('step-phone');
-            const pinStep = document.getElementById('step-pin');
-
-            if (stepId === 'step-pin') {
-                phoneStep.classList.remove('active');
-                phoneStep.classList.add('hidden-left');
-                pinStep.classList.add('active');
-                document.getElementById('pin-input').focus();
-            } else {
-                pinStep.classList.remove('active');
-                phoneStep.classList.remove('hidden-left');
-                phoneStep.classList.add('active');
-                document.getElementById('phone-input').focus();
-            }
-        }
-
-        // === PHONE MASKING ===
-        const phoneInput = document.getElementById('phone-input');
+        // ==========================================
+        // TAB SWITCHING LOGIC
+        // ==========================================
+        tabLogin.addEventListener('change', () => { if (tabLogin.checked) authCard.classList.remove('is-register'); });
+        tabRegister.addEventListener('change', () => { if (tabRegister.checked) authCard.classList.add('is-register'); });
         
-        // Set cursor to end
-        phoneInput.addEventListener('focus', function() {
-            setTimeout(() => {
-                if (this.value.length < 4) this.value = '+7 (';
-                this.selectionStart = this.selectionEnd = this.value.length;
-            }, 0);
-        });
+        // Role Switching Logic
+        rolePassenger.addEventListener('change', () => { if(rolePassenger.checked) driverFields.classList.remove('active'); });
+        roleDriver.addEventListener('change', () => { if(roleDriver.checked) driverFields.classList.add('active'); });
 
-        phoneInput.addEventListener('input', function(e) {
-            let input = e.target.value.replace(/\D/g, ''); // Remove non-digits
-            
-            // Keep only 10 digits after 7 (total 11 with country code)
-            if (input.length > 11) input = input.substring(0, 11);
-            
-            let formatted = '';
+        // ==========================================
+        // PHONE MASK
+        // ==========================================
+        function formatPhone(val) {
+            let input = val.replace(/\D/g, '');
             if (input.length > 0) {
-                // Handle cases where user deletes the +7 part
-                if (!input.startsWith('7') && !input.startsWith('8')) {
-                     formatted = '+7 (' + input.substring(0, 3);
-                } else {
-                    formatted = '+7 (' + input.substring(1, 4);
-                }
+                if (input[0] === '8' || input[0] === '7') input = input.substring(1);
+                let f = '+7';
+                if (input.length > 0) f += ' (' + input.substring(0, 3);
+                if (input.length > 3) f += ') ' + input.substring(3, 6);
+                if (input.length > 6) f += '-' + input.substring(6, 8);
+                if (input.length > 8) f += '-' + input.substring(8, 10);
+                return f;
             }
-            if (input.length >= 4) formatted += ') ' + input.substring(4, 7);
-            if (input.length >= 7) formatted += '-' + input.substring(7, 9);
-            if (input.length >= 9) formatted += '-' + input.substring(9, 11);
-            
-            e.target.value = formatted;
-
-            // Transition to PIN if full number
-            if (input.length >= 11 || (input.length >= 10 && !input.startsWith('7'))) {
-                currentPhone = formatted;
-                document.getElementById('phone-display').innerText = formatted;
-                setTimeout(() => showStep('step-pin'), 200);
-            }
-        });
-
-        // === PIN LOGIC ===
-        const pinInput = document.getElementById('pin-input');
-        
-        function focusHiddenInput() {
-            pinInput.focus();
+            return '';
         }
 
-        pinInput.addEventListener('input', async function(e) {
-            let val = e.target.value.replace(/\D/g, '');
-            if (val.length > 4) val = val.substring(0, 4);
-            e.target.value = val;
-            
-            updatePinDots(val);
-            document.getElementById('error-msg').classList.remove('show');
-
-            if (val.length === 4) {
-                // Check PIN
-                if (val === TEST_PIN) {
-                    await checkUserInDb();
-                } else {
-                    document.getElementById('error-msg').classList.add('show');
-                    // Shake animation logic could go here
-                    e.target.value = '';
-                    updatePinDots('');
-                }
-            }
-        });
-
-        function updatePinDots(val) {
-            const dots = document.querySelectorAll('.pin-dot');
-            dots.forEach((dot, index) => {
-                if (index < val.length) dot.classList.add('filled');
-                else dot.classList.remove('filled');
+        function setupPhoneInput(id) {
+            const el = document.getElementById(id);
+            el.addEventListener('input', (e) => {
+                e.target.value = formatPhone(e.target.value);
             });
         }
+        
+        setupPhoneInput('loginPhone');
+        setupPhoneInput('regPhone');
 
-        // === DATABASE LOGIC ===
-        async function checkUserInDb() {
-            // Visual loader maybe? Not implemented for simplicity as it's fast
-            
-            // Query Supabase for phone
-            const { data, error } = await db
-                .from('UCHALY_profiles')
-                .select('*')
-                .eq('phone', currentPhone)
-                .single();
+        // ==========================================
+        // LOGIN LOGIC
+        // ==========================================
+        const pinInput = document.getElementById('pinInput');
+        const pinDots = document.querySelectorAll('.pin-dot');
+        const loginStep1 = document.getElementById('loginStep1');
+        const loginStep2 = document.getElementById('loginStep2');
+        
+        // Click on PIN area focuses hidden input
+        document.querySelector('.pin-dots-container').addEventListener('click', () => pinInput.focus());
 
-            if (data) {
-                // USER EXISTS
-                alert("Добро пожаловать, " + data.name + "!");
-                // Here you would redirect to the Dashboard
-            } else if (error && error.code === 'PGRST116') {
-                // USER NOT FOUND -> Go to Registration
-                isNewUser = true;
-                document.getElementById('reg-phone-display').value = currentPhone;
-                showScreen('screen-register');
+        document.getElementById('getCodeBtn').addEventListener('click', () => {
+            const phone = document.getElementById('loginPhone').value;
+            if (phone.length === 18) {
+                loginStep1.style.display = 'none';
+                loginStep2.style.display = 'block';
+                pinInput.focus();
             } else {
-                alert("Ошибка базы данных: " + error.message);
+                alert("Введите корректный номер");
+            }
+        });
+
+        pinInput.addEventListener('input', async (e) => {
+            let val = e.target.value.replace(/\D/g, '');
+            e.target.value = val;
+            
+            // Update dots UI
+            pinDots.forEach((dot, i) => {
+                if (i < val.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+            document.getElementById('loginError').style.opacity = 0;
+
+            if (val.length === 4) {
+                if (val === TEST_PIN) {
+                    await checkUserInDb(document.getElementById('loginPhone').value);
+                } else {
+                    document.getElementById('loginError').style.opacity = 1;
+                    pinInput.value = '';
+                    pinDots.forEach(d => d.classList.remove('filled'));
+                }
+            }
+        });
+
+        async function checkUserInDb(phone) {
+            const { data, error } = await db.from('profiles').select('*').eq('phone', phone).single();
+            
+            if (data) {
+                currentUser = data;
+                showApp();
+            } else if (error && error.code === 'PGRST116') {
+                alert("Пользователь не найден. Пожалуйста, зарегистрируйтесь.");
+                // Switch to Reg
+                tabRegister.checked = true;
+                authCard.classList.add('is-register');
+                document.getElementById('regPhone').value = phone;
+            } else {
+                alert("Ошибка БД: " + error.message);
             }
         }
 
-        // === REGISTRATION LOGIC ===
-        async function registerUser() {
-            const name = document.getElementById('reg-name').value.trim();
-            const terms = document.getElementById('terms').checked;
-            const btn = document.getElementById('btn-reg');
+        // ==========================================
+        // REGISTRATION LOGIC
+        // ==========================================
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('regSubmitBtn');
+            
+            // Gather Data
+            const isDriver = roleDriver.checked;
+            const phone = document.getElementById('regPhone').value;
+            const lastName = document.getElementById('regLastName').value;
+            const firstName = document.getElementById('regFirstName').value;
+            const middleName = document.getElementById('regMiddleName').value;
 
-            if (!name) { alert("Введите имя"); return; }
-            if (!terms) { alert("Примите условия"); return; }
+            if (!phone || !lastName || !firstName) {
+                showError("Заполните обязательные поля"); return;
+            }
+            if (phone.length !== 18) {
+                showError("Некорректный телефон"); return;
+            }
 
             btn.classList.add('loading');
 
-            const { data, error } = await db
-                .from('UCHALY_profiles')
-                .insert([
-                    { phone: currentPhone, name: name, role: 'passenger' }
-                ]);
+            // Prepare object
+            let insertData = {
+                phone: phone,
+                last_name: lastName,
+                first_name: firstName,
+                middle_name: middleName,
+                role: isDriver ? 'driver' : 'passenger'
+            };
+
+            // If Driver, add extra fields
+            if (isDriver) {
+                insertData.car_model = document.getElementById('regCarModel').value;
+                insertData.car_color = document.getElementById('regCarColor').value;
+                insertData.car_plate = document.getElementById('regCarPlate').value;
+                // Note: File uploads need separate handling in Supabase Storage
+                // For now, we just register the user. 
+            }
+
+            const { data, error } = await db.from('profiles').insert([insertData]).select().single();
 
             btn.classList.remove('loading');
 
             if (error) {
-                alert("Ошибка регистрации: " + error.message);
+                if (error.code === '23505') showError("Номер уже зарегистрирован");
+                else showError(error.message);
             } else {
+                currentUser = data;
                 alert("Регистрация успешна!");
-                // Redirect to Dashboard
+                showApp();
+            }
+        });
+
+        function showError(msg) {
+            const el = document.getElementById('regError');
+            el.textContent = msg;
+            el.style.opacity = 1;
+        }
+
+        // ==========================================
+        // APP STATE
+        // ==========================================
+        function showApp() {
+            authOverlay.classList.remove('visible');
+            setTimeout(() => {
+                appContainer.classList.add('visible');
+                updateUI();
+            }, 400);
+        }
+
+        function hideApp() {
+            appContainer.classList.remove('visible');
+            setTimeout(() => {
+                authOverlay.classList.add('visible');
+                loginForm.reset();
+                registerForm.reset();
+                // Reset steps
+                loginStep1.style.display = 'block';
+                loginStep2.style.display = 'none';
+                pinInput.value = '';
+                pinDots.forEach(d => d.classList.remove('filled'));
+                // Reset Tabs
+                tabLogin.checked = true;
+                authCard.classList.remove('is-register');
+                rolePassenger.checked = true;
+                driverFields.classList.remove('active');
+            }, 400);
+        }
+
+        function updateUI() {
+            if (currentUser) {
+                const name = currentUser.first_name || 'User';
+                headerNickname.textContent = name;
+                document.getElementById('pageTitle').textContent = "Добро пожаловать, " + name;
             }
         }
 
-        // Initial focus
-        document.getElementById('phone-input').value = '+7 (';
-        
+        document.getElementById('logoutBtn').addEventListener('click', hideApp);
+
     </script>
 </body>
 </html>
