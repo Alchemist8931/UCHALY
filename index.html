@@ -100,7 +100,7 @@
 
         .landing-enter-btn {
             position: fixed;
-            top: 20px;
+            top: 46px; /* 40px (header height approx) + 6px */
             right: 20px;
             z-index: 20;
             background-color: var(--text-primary);
@@ -259,8 +259,8 @@
         .tab-container .tab--register:checked ~ .indicator { left: 50%; }
         
         .sub-tab-container { 
-            position: absolute; top: calc(100% + 12px); right: 24px; 
-            width: calc(50% - 4px); display: flex; padding: 2px; 
+            position: absolute; top: calc(100% + 12px); right: 28px; 
+            width: calc(50% - 32px); display: flex; padding: 2px; 
             background-color: var(--bg-card); border-radius: 10px; 
             border: 1px solid var(--border-color); 
             z-index: 10; opacity: 0; transform: translateY(-10px); 
@@ -287,7 +287,7 @@
         .auth-card.is-register .login-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(-30px); z-index: 1; pointer-events: none; }
         .auth-card.is-register .register-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; pointer-events: auto; }
 
-        .form-scroll-area { max-height: 300px; overflow-y: auto; padding: 8px 4px 0 4px; }
+        .form-scroll-area { max-height: 300px; overflow-y: scroll; padding: 8px 4px 0 4px; } /* Changed to scroll */
         .form-scroll-area::-webkit-scrollbar { width: 4px; }
         .form-scroll-area::-webkit-scrollbar-track { background: transparent; }
         .form-scroll-area::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
@@ -368,7 +368,8 @@
         .app-body {
             flex: 1;
             margin-top: calc(50px + env(safe-area-inset-top) + 10px);
-            margin-bottom: calc(110px + env(safe-area-inset-bottom));
+            /* Adjusted margin-bottom to account for fixed menu position */
+            margin-bottom: calc(96px + env(safe-area-inset-bottom)); 
             padding: 10px 16px;
             overflow-y: auto; position: relative; z-index: 10;
         }
@@ -381,12 +382,14 @@
         .page-container.visible { opacity: 1; transform: translateY(0); }
 
         .app-menu {
-            position: fixed; bottom: 16px; left: 16px; right: 16px; height: 80px;
+            position: fixed; 
+            /* Updated positioning logic */
+            bottom: calc(16px + env(safe-area-inset-bottom)); 
+            left: 16px; right: 16px; height: 80px;
             background: var(--bg-card);
             border-radius: 24px;
             z-index: 50;
             display: flex; align-items: center; justify-content: center; padding: 10px;
-            margin-bottom: env(safe-area-inset-bottom);
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border-color);
         }
@@ -402,8 +405,16 @@
         .radio-inputs .radio:hover .name { background-color: var(--bg-app); }
         .menu-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
 
-        .driver-fields { display: none; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 14px; }
-        .driver-fields.active { display: block; animation: fadeIn 0.3s ease; }
+        .driver-fields { 
+            display: none; 
+            margin-top: 10px; 
+            border-top: 1px solid var(--border-color); 
+            padding-top: 14px; 
+        }
+        .driver-fields.active { 
+            display: block; 
+            animation: fadeIn 0.3s ease; 
+        }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ================= VIEW TOGGLE (Page 1) ================= */
@@ -601,7 +612,8 @@
         /* ================= FAB ================= */
         .fab-container {
             position: fixed;
-            bottom: calc(110px + env(safe-area-inset-bottom));
+            /* Adjusted FAB position to be above the menu */
+            bottom: calc(96px + env(safe-area-inset-bottom));
             right: 20px;
             z-index: 60;
             display: none; 
@@ -678,8 +690,9 @@
         <!-- LANDING PAGE -->
         <div class="landing-page" id="landingPage">
             <div class="landing-header">
-                <button class="landing-enter-btn" id="landingEnterBtn">Вход в сервис</button>
+                <!-- Header is empty visually, line is at bottom -->
             </div>
+            <button class="landing-enter-btn" id="landingEnterBtn">Вход в сервис</button>
             
             <section class="landing-hero">
                 <div class="landing-brand-icon">
@@ -756,7 +769,8 @@
                             <form class="auth-form login-form" id="loginForm">
                                 <div id="loginStep1">
                                     <div class="input-container">
-                                        <input type="tel" class="styled_input_bar" id="loginPhone" placeholder=" " autocomplete="tel">
+                                        <!-- Added readonly to prevent autofocus on mobile -->
+                                        <input type="tel" class="styled_input_bar" id="loginPhone" placeholder=" " autocomplete="tel" readonly>
                                         <label class="input-label" for="loginPhone">Номер телефона</label>
                                     </div>
                                     <button type="button" class="submit-btn" id="getCodeBtn"><span class="btn-text">Получить код</span><div class="loader"></div></button>
@@ -776,16 +790,16 @@
                             <!-- REGISTER FORM -->
                             <form class="auth-form register-form" id="registerForm">
                                 <div class="form-scroll-area">
-                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regLastName" placeholder=" "><label class="input-label" for="regLastName">Фамилия</label></div>
-                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regFirstName" placeholder=" "><label class="input-label" for="regFirstName">Имя</label></div>
-                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regMiddleName" placeholder=" "><label class="input-label" for="regMiddleName">Отчество</label></div>
-                                    <div class="input-container"><input type="tel" class="styled_input_bar" id="regPhone" placeholder=" " maxlength="18"><label class="input-label" for="regPhone">Телефон</label></div>
+                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regLastName" placeholder=" " readonly><label class="input-label" for="regLastName">Фамилия</label></div>
+                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regFirstName" placeholder=" " readonly><label class="input-label" for="regFirstName">Имя</label></div>
+                                    <div class="input-container"><input type="text" class="styled_input_bar" id="regMiddleName" placeholder=" " readonly><label class="input-label" for="regMiddleName">Отчество</label></div>
+                                    <div class="input-container"><input type="tel" class="styled_input_bar" id="regPhone" placeholder=" " maxlength="18" readonly><label class="input-label" for="regPhone">Телефон</label></div>
 
                                     <div class="driver-fields" id="driverFields">
                                         <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; font-weight:600; text-transform:uppercase;">Данные транспортного средства</div>
-                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarModel" placeholder=" "><label class="input-label" for="regCarModel">Марка автомобиля</label></div>
-                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarColor" placeholder=" "><label class="input-label" for="regCarColor">Цвет автомобиля</label></div>
-                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarPlate" placeholder=" "><label class="input-label" for="regCarPlate">Гос номер</label></div>
+                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarModel" placeholder=" " readonly><label class="input-label" for="regCarModel">Марка автомобиля</label></div>
+                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarColor" placeholder=" " readonly><label class="input-label" for="regCarColor">Цвет автомобиля</label></div>
+                                        <div class="input-container"><input type="text" class="styled_input_bar" id="regCarPlate" placeholder=" " readonly><label class="input-label" for="regCarPlate">Гос номер</label></div>
                                         
                                         <div style="font-size:12px; color:var(--text-secondary); margin:12px 0; font-weight:600; text-transform:uppercase;">Загрузка документов</div>
                                         
@@ -1018,6 +1032,10 @@
         landingEnterBtn.addEventListener('click', () => {
             landingPage.classList.add('hidden');
             authOverlay.classList.add('visible');
+            
+            // Remove readonly from auth inputs when opening the form
+            const authInputs = authOverlay.querySelectorAll('input[readonly]');
+            authInputs.forEach(input => input.removeAttribute('readonly'));
         });
 
         // ==========================================
