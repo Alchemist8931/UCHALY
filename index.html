@@ -79,7 +79,7 @@
 
         .auth-container { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; position: relative; }
 
-        .auth-brand { margin-bottom: 48px; text-align: center; }
+        .auth-brand { margin-bottom: 24px; text-align: center; }
         .brand-icon { 
             width: 64px; height: 64px; 
             background: var(--text-primary); border-radius: 20px; 
@@ -105,7 +105,7 @@
         /* Tabs */
         .tab-container { position: relative; display: flex; padding: 4px; background-color: var(--bg-app); border-radius: 14px; border: none; }
         .tab-container .indicator { width: calc(50% - 4px); height: 100%; background: var(--bg-card); position: absolute; top: 4px; left: 4px; z-index: 9; border-radius: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-sm); }
-        .tab-container .tab { width: 50%; height: 40px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
+        .tab-container .tab { width: 50%; height: 32px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
         .tab-container .tab_label { width: 50%; height: 40px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: color 0.3s ease; }
         .tab-container .tab:checked + .tab_label { color: var(--text-primary); }
         .tab-container .tab--register:checked ~ .indicator { left: 50%; }
@@ -139,7 +139,7 @@
         .auth-card.is-register .login-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(-30px); z-index: 1; pointer-events: none; }
         .auth-card.is-register .register-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; pointer-events: auto; }
 
-        .form-scroll-area { max-height: 300px; overflow-y: auto; padding-right: 4px; }
+        .form-scroll-area { max-height: 300px; overflow-y: auto; padding-right: 4px; padding-top: 6px; }
         .form-scroll-area::-webkit-scrollbar { width: 4px; }
         .form-scroll-area::-webkit-scrollbar-track { background: transparent; }
         .form-scroll-area::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
