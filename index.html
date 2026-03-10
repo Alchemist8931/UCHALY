@@ -222,12 +222,13 @@
             background: var(--bg-app);
             opacity: 0; visibility: hidden; pointer-events: none;
             transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+            overflow-y: auto; /* Allow scroll if needed */
         }
         .auth-overlay.visible { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.5s ease, visibility 0s linear 0s; }
 
         .auth-container { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; position: relative; }
 
-        .auth-brand { margin-bottom: 48px; text-align: center; }
+        .auth-brand { margin-bottom: 20px; text-align: center; } /* Changed from 48px */
         .brand-icon { 
             width: 64px; height: 64px; 
             background: var(--text-primary); border-radius: 20px; 
@@ -236,7 +237,7 @@
             box-shadow: var(--shadow-md);
         }
         .brand-icon svg { width: 32px; height: 32px; fill: white; }
-        .brand-title { font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.5px; }
+        .brand-title { font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; letter-spacing: -0.5px; } /* Changed from 8px */
         .brand-subtitle { font-size: 15px; color: var(--text-secondary); font-weight: 500; }
 
         .auth-card { 
@@ -245,6 +246,7 @@
             box-shadow: var(--shadow-lg); overflow: hidden; 
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
             transform: scale(0.95) translateY(20px); 
+            flex-shrink: 0; /* Prevent card squishing */
         }
         .auth-overlay.visible .auth-card { transform: scale(1) translateY(0); }
         
@@ -383,7 +385,11 @@
 
         .app-menu {
             position: fixed; 
-            /* Updated positioning logic */
+            /* Updated positioning logic:
+               16px base margin + safe-area-inset (Home indicator height on iOS PWA).
+               In browser, safe-area is usually 0, so bottom is 16px.
+               This keeps menu above browser UI bars if they overlay content. 
+            */
             bottom: calc(16px + env(safe-area-inset-bottom)); 
             left: 16px; right: 16px; height: 80px;
             background: var(--bg-card);
@@ -1102,6 +1108,15 @@
         const loginStep2 = document.getElementById('loginStep2');
         
         document.querySelector('.pin-dots-container').addEventListener('click', () => pinInput.focus());
+
+        // Handle input focus for centering on keyboard open
+        const loginPhoneInput = document.getElementById('loginPhone');
+        loginPhoneInput.addEventListener('focus', function() {
+            // Timeout allows the virtual keyboard to start opening and viewport to resize
+            setTimeout(() => {
+                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        });
 
         document.getElementById('getCodeBtn').addEventListener('click', () => {
             const phone = document.getElementById('loginPhone').value;
