@@ -461,9 +461,9 @@
     .auth-card-header { padding: 20px 20px 0; position: relative; }
 
     .tab-container { position: relative; display: flex; padding: 3px; background-color: var(--tab-bg); border-radius: 14px; border: 1px solid var(--border-color); }
-    .tab-container .indicator { width: 50%; height: 40px; background: var(--tab-active); position: absolute; top: 3px; left: 3px; z-index: 9; border-radius: 11px; border: 1px solid var(--border-light); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .tab-container .tab { width: 50%; height: 40px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
-    .tab-container .tab_label { width: 50%; height: 40px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
+    .tab-container .indicator { width: 50%; height: 36px; background: var(--tab-active); position: absolute; top: 3px; left: 3px; z-index: 9; border-radius: 11px; border: 1px solid var(--border-light); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .tab-container .tab { width: 50%; height: 36px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
+    .tab-container .tab_label { width: 50%; height: 36px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: color 0.3s ease; }
     .tab-container .tab:checked + .tab_label { color: var(--text-primary); }
     .tab-container .tab--register:checked ~ .indicator { left: 50%; }
 
@@ -476,7 +476,7 @@
     .auth-card.is-register .login-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(-30px); z-index: 1; pointer-events: none; }
     .auth-card.is-register .register-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; pointer-events: auto; }
 
-    .input-container { position: relative; width: 100%; }
+    .input-container { position: relative; width: 100%; margin-top: 6px; }
     .styled_input_bar { width: 100%; padding: 16px 16px; font-size: 15px; font-family: 'SN Pro', sans-serif; border: 1.5px solid var(--border-color); border-radius: 14px; background-color: var(--bg-secondary); color: var(--text-primary); outline: none; transition: all 0.3s ease; }
     .styled_input_bar::placeholder { color: transparent; }
     .styled_input_bar:focus { border-color: var(--brand-green-light); background-color: var(--bg-card); box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15); }
