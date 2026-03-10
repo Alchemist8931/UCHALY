@@ -67,6 +67,154 @@
             flex-direction: column;
         }
 
+        /* ================= LANDING PAGE ================= */
+        .landing-page {
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            background-color: var(--bg-app);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease, visibility 0s linear 0s;
+        }
+        .landing-page.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+        }
+
+        .landing-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 20px;
+            background-color: rgba(245, 245, 247, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .landing-enter-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 20;
+            background-color: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        .landing-enter-btn:active {
+            transform: scale(0.96);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .landing-hero {
+            padding: 80px 24px 60px;
+            text-align: center;
+            position: relative;
+        }
+        .landing-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 100px;
+            background: radial-gradient(ellipse at center, rgba(20, 154, 70, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .landing-brand-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--text-primary);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            box-shadow: var(--shadow-lg);
+        }
+        .landing-brand-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+        .landing-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        .landing-subtitle {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 320px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .landing-section {
+            padding: 40px 24px;
+        }
+        .landing-section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        .landing-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+        .landing-image-placeholder {
+            width: 100%;
+            height: 200px;
+            background-color: var(--divider);
+            border-radius: 20px;
+            margin: 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .landing-footer {
+            padding: 40px 24px 80px;
+            text-align: center;
+            border-top: 1px solid var(--divider);
+            margin-top: 40px;
+            background-color: white;
+        }
+        .landing-footer-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .landing-legal-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
         /* ================= AUTH SECTION ================= */
         .auth-overlay {
             position: fixed; inset: 0; z-index: 100;
@@ -103,10 +251,10 @@
         .auth-card-header { padding: 24px 24px 0; position: relative; }
 
         /* Tabs */
-        .tab-container { position: relative; display: flex; padding: 4px; background-color: var(--bg-app); border-radius: 14px; border: none; }
-        .tab-container .indicator { width: calc(50% - 4px); height: 100%; background: var(--bg-card); position: absolute; top: 4px; left: 4px; z-index: 9; border-radius: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-sm); }
-        .tab-container .tab { width: 50%; height: 40px; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
-        .tab-container .tab_label { width: 50%; height: 40px; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: color 0.3s ease; }
+        .tab-container { position: relative; display: flex; padding: 4px; background-color: var(--bg-app); border-radius: 14px; border: none; height: 40px; }
+        .tab-container .indicator { width: calc(50% - 4px); height: calc(100% - 8px); background: var(--bg-card); position: absolute; top: 4px; left: 4px; z-index: 9; border-radius: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-sm); }
+        .tab-container .tab { width: 50%; height: 100%; position: absolute; z-index: 99; outline: none; opacity: 0; cursor: pointer; }
+        .tab-container .tab_label { width: 50%; height: 100%; position: relative; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: color 0.3s ease; }
         .tab-container .tab:checked + .tab_label { color: var(--text-primary); }
         .tab-container .tab--register:checked ~ .indicator { left: 50%; }
         
@@ -139,7 +287,7 @@
         .auth-card.is-register .login-form { position: absolute; top: 0; left: 0; right: 0; opacity: 0; visibility: hidden; transform: translateX(-30px); z-index: 1; pointer-events: none; }
         .auth-card.is-register .register-form { position: relative; opacity: 1; visibility: visible; transform: translateX(0); z-index: 2; pointer-events: auto; }
 
-        .form-scroll-area { max-height: 300px; overflow-y: auto; padding-right: 4px; }
+        .form-scroll-area { max-height: 300px; overflow-y: auto; padding: 8px 4px 0 4px; }
         .form-scroll-area::-webkit-scrollbar { width: 4px; }
         .form-scroll-area::-webkit-scrollbar-track { background: transparent; }
         .form-scroll-area::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
@@ -365,8 +513,7 @@
             background: var(--text-primary);
             border-radius: 12px;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: center; justify-content: center;
             font-size: 18px;
             z-index: 4;
             box-shadow: var(--shadow-md);
@@ -528,8 +675,52 @@
 
     <div id="app">
         
+        <!-- LANDING PAGE -->
+        <div class="landing-page" id="landingPage">
+            <div class="landing-header">
+                <button class="landing-enter-btn" id="landingEnterBtn">Вход в сервис</button>
+            </div>
+            
+            <section class="landing-hero">
+                <div class="landing-brand-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <h1 class="landing-title">Едем Учалы</h1>
+                <p class="landing-subtitle">Сервис совместных поездок по району и за его пределы</p>
+            </section>
+
+            <section class="landing-section">
+                <h2 class="landing-section-title">О сервисе</h2>
+                <p class="landing-text">«Едем Учалы» — это современный сервис для объединения водителей и пассажиров. Наша цель — сделать поездки по району и междугородние переезды комфортнее, экономичнее и дружелюбнее. Находите попутчиков, делите расходы на топливо и путешествуйте вместе.</p>
+                <div class="landing-image-placeholder">Изображение: Карта маршрутов района</div>
+                <p class="landing-text">Для водителей: создавайте маршруты, находите пассажиров на своем пути, используйте шаблоны для любимых направлений.</p>
+                <p class="landing-text">Для пассажиров: ищите ближайшие поездки, бронируйте места и отправляйтесь в путь без лишних хлопот.</p>
+            </section>
+
+            <section class="landing-section">
+                <h2 class="landing-section-title">Город Учалы</h2>
+                <p class="landing-text">Учалы — уютный город на Южном Урале, окруженный живописными озерами и холмами. Город с богатой историей и добрыми традициями. Сервис «Едем Учалы» создан, чтобы связывать жителей района, делая их жизнь мобильнее и удобнее.</p>
+                <div class="landing-image-placeholder">Изображение: Панорама города Учалы</div>
+                <p class="landing-text">Мы верим, что поездки вместе — это не только экономия, но и новые знакомства, обмен новостями и укрепление нашего сообщества.</p>
+            </section>
+
+            <footer class="landing-footer">
+                <h3 class="landing-footer-title">ООО «Едем Учалы»</h3>
+                <div class="landing-legal-text">
+                    ИНН 0245000000<br>
+                    КПП 024501001<br>
+                    ОГРН 1020200000000<br>
+                    Адрес: 453700, Республика Башкортостан, г. Учалы, ул. Ленина, д. 1, офис 101<br>
+                    Телефон: +7 (34791) 5-00-00<br>
+                    Email: info@edem-uchaly.ru<br>
+                    <br>
+                    Все права защищены. 2023-2024.
+                </div>
+            </footer>
+        </div>
+
         <!-- AUTH OVERLAY -->
-        <div class="auth-overlay visible" id="authOverlay">
+        <div class="auth-overlay" id="authOverlay">
             <div class="auth-container">
                 <div class="auth-brand">
                     <div class="brand-icon">
@@ -804,6 +995,8 @@
         // ==========================================
         // DOM ELEMENTS
         // ==========================================
+        const landingPage = document.getElementById('landingPage');
+        const landingEnterBtn = document.getElementById('landingEnterBtn');
         const authCard = document.getElementById('authCard');
         const authOverlay = document.getElementById('authOverlay');
         const appContainer = document.getElementById('appContainer');
@@ -818,6 +1011,14 @@
         const fabContainer = document.getElementById('fabContainer');
         const createTripModal = document.getElementById('createTripModal');
         const pageContainer = document.getElementById('pageContainer');
+
+        // ==========================================
+        // LANDING PAGE LOGIC
+        // ==========================================
+        landingEnterBtn.addEventListener('click', () => {
+            landingPage.classList.add('hidden');
+            authOverlay.classList.add('visible');
+        });
 
         // ==========================================
         // TAB SWITCHING LOGIC (Auth)
